@@ -15,3 +15,5 @@ data/
 .DS_Store
 Thumbs.db
 *.log
+references/github-v60/konsta/
+references/github-v60/shadcn-ui/
