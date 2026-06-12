@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ServerLens</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="retro-v9-shell retro-v10-shell" data-component-system="serverlens-v100">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="app-shell retro-workbench" data-slot="sidebar-wrapper">
+      <aside class="sidebar retro-rail" data-slot="sidebar" data-retro-card data-variant="inset" aria-label="Primary navigation">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <strong>ServerLens</strong>
+            <span>15.0</span>
+          </div>
+        </div>
+
+        <nav class="nav-list" data-slot="sidebar-menu">
+          <button class="nav-item ios-segment is-active" data-slot="sidebar-menu-button" data-active="true" data-view="overview" type="button">Overview</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="servers" type="button">Servers</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="server-detail" type="button">Detail</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="analysis" type="button">Analysis</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="reports" type="button">Reports</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="alerts" type="button">Alerts</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="delivery" type="button">Delivery</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="interaction" type="button">Studio</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="settings" type="button">Settings</button>
+        </nav>
+      </aside>
+
+      <main class="workspace" data-slot="sidebar-inset" id="main-content" tabindex="-1">
+        <header class="topbar" data-slot="card-header">
+          <div>
+            <p class="eyebrow"><span class="ios-badge" data-slot="badge" data-variant="outline">15.0</span></p>
+            <h1 id="view-title">Overview</h1>
+          </div>
+          <div class="topbar-actions" data-slot="button-group">
+            <button class="icon-action ios-button" data-slot="button" data-variant="ghost" data-size="icon" id="command-palette-button" aria-label="Search" aria-controls="command-palette" aria-expanded="false" type="button">&#47;</button>
+            <button class="secondary-action ios-button" data-slot="button" data-variant="outline" id="live-monitor-toggle" aria-pressed="true" type="button">Live</button>
+            <button class="secondary-action ios-button" data-slot="button" data-variant="outline" id="action-dock-toggle" aria-controls="action-dock" aria-expanded="false" type="button">Dock</button>
+            <button class="secondary-action ios-button" data-slot="button" data-variant="secondary" id="collect-button" type="button">Collect</button>
+            <button class="primary-action ios-button" data-slot="button" data-variant="default" id="analyze-button" type="button">Analyze</button>
+          </div>
+        </header>
+        <section class="page-operation-summary" id="page-operation-summary" aria-label="Page operation summary" aria-live="polite" data-retro-card>
+          <div>
+            <span class="ios-badge" data-slot="badge" data-variant="secondary">Page</span>
+            <h2 id="page-operation-title">Review live fleet pressure</h2>
+          </div>
+          <button class="primary-action page-operation-action" id="page-operation-action" type="button">Open Servers</button>
+          <div class="page-operation-evidence" id="page-operation-evidence"></div>
+          <p class="page-operation-next-step" id="page-operation-next-step">Open Servers to resolve the first connection or health issue.</p>
+        </section>
+        <section class="ios-toolbar v9-reference-banner retro-reference-bar" data-slot="tabs-list" aria-label="Version 9 delivery context">
+          <span class="ios-badge" data-slot="badge" data-variant="secondary">RetroUI</span>
+          <span class="ios-badge" data-slot="badge" data-variant="outline">10.0</span>
+        </section>
+
+        <section class="view is-visible" id="overview-view">
+          <div class="metric-strip" id="metric-strip"></div>
+          <section class="panel live-monitor-panel" aria-label="Live monitor">
+            <div class="section-heading">
+              <h2>Live Monitor</h2>
+              <span id="live-monitor-status" aria-live="polite">Polling</span>
+            </div>
+            <div class="live-monitor-grid" id="live-monitor-grid"></div>
+          </section>
+          <div class="split-layout">
+            <section class="panel wide-panel">
+              <div class="section-heading">
+                <h2>Signal Timeline</h2>
+                <span id="freshness-label">Waiting for data</span>
+              </div>
+              <div class="timeline" id="timeline"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Exposure</h2>
+                <span>Ports and services</span>
+              </div>
+              <div class="exposure-list" id="exposure-list"></div>
+            </section>
+          </div>
+          <div class="split-layout lower-grid">
+            <section class="panel wide-panel">
+              <div class="section-heading">
+                <h2>Server Health Ranking</h2>
+                <span>Fleet</span>
+              </div>
+              <div class="health-table" id="health-table"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Recent Alerts</h2>
+                <span>Severity</span>
+              </div>
+              <div class="alert-stack" id="alert-stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="servers-view">
+          <div class="section-heading">
+            <h2>Server Inventory</h2>
+            <span>Assets</span>
+          </div>
+          <label class="search-field">
+            Search servers
+            <input id="server-search" autocomplete="off" placeholder="Filter by name, host, tag">
+          </label>
+          <label class="toggle-row inventory-toggle">
+            <input id="show-archived-servers" type="checkbox">
+            <span>Show archived</span>
+          </label>
+          <section class="panel connection-health-map" id="connection-health-map" aria-label="Connection Health Map"></section>
+          <form class="server-form" id="server-form">
+            <label>
+              Name
+              <input name="name" value="Production Edge" autocomplete="off">
+            </label>
+            <label>
+              Host
+              <input name="host" value="demo.local" autocomplete="off">
+            </label>
+            <label>
+              Port
+              <input name="port" value="22" type="number" min="1" max="65535" autocomplete="off">
+            </label>
+            <label>
+              Mode
+              <select name="mode">
+                <option value="demo">Demo</option>
+                <option value="local">Local</option>
+                <option value="ssh">SSH</option>
+              </select>
+            </label>
+            <label>
+              Auth
+              <select name="authType">
+                <option value="none">None</option>
+                <option value="agent">SSH agent</option>
+                <option value="ssh-key">SSH key</option>
+                <option value="password">Password</option>
+              </select>
+            </label>
+            <label>
+              SSH user
+              <input name="username" autocomplete="off" placeholder="ops">
+            </label>
+            <label>
+              Key path
+              <input name="keyPath" autocomplete="off" placeholder="Optional">
+            </label>
+            <label>
+              Group
+              <input name="group" value="production" autocomplete="off">
+            </label>
+            <label>
+              Tags
+              <input name="tags" value="manual, edge" autocomplete="off">
+            </label>
+            <button class="primary-action" id="server-submit-button" type="submit">Add Server</button>
+            <button class="secondary-action" id="server-cancel-edit" type="button" hidden>Cancel</button>
+          </form>
+          <section class="inventory-transfer panel">
+            <div class="section-heading">
+              <h2>Inventory Transfer</h2>
+              <span>Metadata only</span>
+            </div>
+            <div class="transfer-actions">
+              <button class="secondary-action" id="inventory-export-button" type="button">Export JSON</button>
+              <button class="secondary-action" id="inventory-import-button" type="button">Import JSON</button>
+              <span class="muted" id="inventory-transfer-status">No payload loaded</span>
+            </div>
+            <textarea id="inventory-transfer-json" spellcheck="false" placeholder="Paste ServerLens inventory JSON"></textarea>
+          </section>
+          <div class="server-list" id="server-list"></div>
+        </section>
+
+        <section class="view" id="server-detail-view">
+          <div class="detail-layout">
+            <section class="panel">
+              <div class="section-heading">
+                <h2>System</h2>
+                <span id="detail-server-label">No server selected</span>
+              </div>
+              <div class="kv-list" id="system-detail"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Processes</h2>
+                <span>Top 5</span>
+              </div>
+              <div class="compact-table" id="process-table"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Logs</h2>
+                <span>Recent events</span>
+              </div>
+              <div class="log-list" id="log-list"></div>
+            </section>
+          </div>
+          <section class="panel performance-panel lower-grid">
+            <div class="section-heading">
+              <h2>Performance</h2>
+              <span>CPU, memory, disk, IO, network</span>
+            </div>
+            <div class="performance-chart" id="performance-chart"></div>
+          </section>
+          <section class="panel security-events-panel lower-grid">
+            <div class="section-heading">
+              <h2>Security Events</h2>
+              <span>Auth, exposure, connections</span>
+            </div>
+            <div class="evidence-tracker" id="detail-evidence-tracker" aria-label="Server detail evidence tracker"></div>
+            <div class="security-events" id="security-events"></div>
+            <div class="risk-event-timeline" id="risk-event-timeline"></div>
+          </section>
+          <section class="panel security-source-review-panel lower-grid">
+            <div class="section-heading">
+              <h2>Security Source Review</h2>
+              <span>Collected source evidence</span>
+            </div>
+            <div class="security-source-review" id="security-source-review"></div>
+          </section>
+          <section class="panel service-topology lower-grid">
+            <div class="section-heading">
+              <h2>Service Topology</h2>
+              <span>Services, ports, containers</span>
+            </div>
+            <div class="topology-map" id="topology-map"></div>
+            <div class="topology-list" id="topology-list"></div>
+          </section>
+          <section class="panel service-catalog-panel lower-grid">
+            <div class="section-heading">
+              <h2>Service Catalog</h2>
+              <span>Roles, exposure, owners</span>
+            </div>
+            <div class="service-catalog-list" id="service-catalog-list"></div>
+          </section>
+          <section class="panel evidence-appendix-panel lower-grid">
+            <div class="section-heading">
+              <h2>Evidence Appendix</h2>
+              <span>Redacted report evidence</span>
+            </div>
+            <div class="evidence-appendix" id="evidence-appendix"></div>
+          </section>
+          <div class="runtime-inventory lower-grid">
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Containers</h2>
+                <span>Docker state</span>
+              </div>
+              <div class="compact-table" id="container-table"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Ports</h2>
+                <span>Listening surface</span>
+              </div>
+              <div class="compact-table" id="port-table"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Firewall</h2>
+                <span>Policy summary</span>
+              </div>
+              <div class="kv-list" id="firewall-detail"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="analysis-view">
+          <div class="analysis-layout">
+            <section class="panel analysis-run-builder" id="analysis-run-builder" aria-label="Analysis run builder">
+              <div class="section-heading">
+                <h2>Run Builder</h2>
+                <span id="analysis-run-summary">Custom scope</span>
+              </div>
+              <div class="analysis-builder-section">
+                <div class="builder-label">
+                  <span>Target</span>
+                  <small>Authorized assets only</small>
+                </div>
+                <div class="analysis-card-grid target-card-grid" id="analysis-target-cards" aria-label="Analysis target cards"></div>
+              </div>
+              <div class="analysis-builder-section">
+                <div class="builder-label">
+                  <span>Preset</span>
+                  <small>Scoped report patterns</small>
+                </div>
+                <div class="analysis-presets analysis-card-grid" aria-label="Analysis presets">
+                  <button class="preset-button analysis-choice-card is-selected" data-analysis-preset="custom" data-analysis-preset-card type="button">
+                    <strong>Custom</strong>
+                    <span>Manual</span>
+                  </button>
+                  <button class="preset-button analysis-choice-card" data-analysis-preset="full-report" data-analysis-preset-card type="button">
+                    <strong>Full Report</strong>
+                    <span>Full</span>
+                  </button>
+                  <button class="preset-button analysis-choice-card" data-analysis-preset="security-review" data-analysis-preset-card type="button">
+                    <strong>Security Review</strong>
+                    <span>Security</span>
+                  </button>
+                  <button class="preset-button analysis-choice-card" data-analysis-preset="runtime-health" data-analysis-preset-card type="button">
+                    <strong>Runtime Health</strong>
+                    <span>Pressure and inventory</span>
+                  </button>
+                  <button class="preset-button analysis-choice-card" data-analysis-preset="service-ecosystem" data-analysis-preset-card type="button">
+                    <strong>Service Ecosystem</strong>
+                    <span>Ports, services, owners</span>
+                  </button>
+                </div>
+              </div>
+              <div class="analysis-builder-section">
+                <div class="builder-label">
+                  <span>Modules</span>
+                  <small>Report sections</small>
+                </div>
+                <fieldset class="module-grid" aria-label="Analysis modules">
+                  <label><input type="checkbox" name="module" value="health" checked> Health</label>
+                  <label><input type="checkbox" name="module" value="security" checked> Security</label>
+                  <label><input type="checkbox" name="module" value="runtime" checked> Runtime</label>
+                  <label><input type="checkbox" name="module" value="ecosystem" checked> Ecosystem</label>
+                  <label><input type="checkbox" name="module" value="logs" checked> Logs</label>
+                  <label><input type="checkbox" name="module" value="network" checked> Network</label>
+                  <label><input type="checkbox" name="module" value="performance" checked> Performance</label>
+                </fieldset>
+              </div>
+              <div class="analysis-builder-section">
+                <div class="builder-label">
+                  <span>Depth</span>
+                  <small>Collection detail</small>
+                </div>
+                <div class="analysis-mode analysis-card-grid" aria-label="Analysis depth">
+                  <button class="segmented analysis-choice-card" data-analysis-depth="quick" data-analysis-depth-card type="button">
+                    <strong>Quick</strong>
+                    <span>Fresh triage</span>
+                  </button>
+                  <button class="segmented analysis-choice-card is-selected" data-analysis-depth="standard" data-analysis-depth-card type="button">
+                    <strong>Standard</strong>
+                    <span>Normal handoff</span>
+                  </button>
+                  <button class="segmented analysis-choice-card" data-analysis-depth="deep" data-analysis-depth-card type="button">
+                    <strong>Deep</strong>
+                    <span>Evidence review</span>
+                  </button>
+                </div>
+              </div>
+              <div class="analysis-builder-section">
+                <div class="builder-label">
+                  <span>Output</span>
+                  <small>After analysis</small>
+                </div>
+                <div class="analysis-output-cards analysis-card-grid" aria-label="Analysis output">
+                  <button class="analysis-choice-card is-selected" data-analysis-output-card="page" type="button">
+                    <strong>Page</strong>
+                    <span>Open report center</span>
+                  </button>
+                  <button class="analysis-choice-card" data-analysis-output-card="markdown" type="button">
+                    <strong>Markdown</strong>
+                    <span>Copy handoff text</span>
+                  </button>
+                  <button class="analysis-choice-card" data-analysis-output-card="pdf" type="button">
+                    <strong>PDF</strong>
+                    <span>Print-ready view</span>
+                  </button>
+                </div>
+              </div>
+              <div class="analysis-legacy-controls" aria-label="Analysis compatibility controls">
+                <label class="search-field analysis-scope-field">
+                  Target server
+                  <select id="analysis-target-server"></select>
+                </label>
+                <label class="search-field analysis-scope-field">
+                  Time range
+                  <select id="analysis-time-range">
+                    <option value="latest-snapshot">Latest snapshot</option>
+                    <option value="last-15m">Last 15 minutes</option>
+                    <option value="last-1h">Last 1 hour</option>
+                    <option value="last-24h">Last 24 hours</option>
+                  </select>
+                </label>
+                <label class="search-field analysis-output-field">
+                  Output
+                  <select id="analysis-output-format">
+                    <option value="page">Page report</option>
+                    <option value="markdown">Markdown copy</option>
+                    <option value="pdf">PDF handoff</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Evidence Chain</h2>
+                <span>Local proof path</span>
+              </div>
+              <div class="evidence-tracker" id="analysis-evidence-tracker" aria-label="Analysis evidence tracker"></div>
+              <div class="progress-track">
+                <span></span>
+              </div>
+              <ol class="task-steps">
+                <li class="is-done">Create task</li>
+                <li class="is-done">Collect telemetry</li>
+                <li class="is-active">Run analysis</li>
+                <li>Generate report</li>
+              </ol>
+              <div class="job-list" id="job-list"></div>
+            </section>
+            <section class="panel wide-panel">
+              <div class="section-heading">
+                <h2>Findings</h2>
+                <span id="finding-count">0 active</span>
+              </div>
+              <div class="findings-list" id="findings-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view delivery-view" id="delivery-view">
+          <nav class="delivery-tabs" id="delivery-tabs" data-slot="tabs-list" role="tablist" aria-label="Delivery workspace tabs">
+            <button class="delivery-tab is-active" id="delivery-tab-button-inspect" data-delivery-tab="inspect" data-active="true" role="tab" aria-selected="true" aria-controls="delivery-tab-inspect" type="button">Inspect</button>
+            <button class="delivery-tab" id="delivery-tab-button-validate" data-delivery-tab="validate" role="tab" aria-selected="false" aria-controls="delivery-tab-validate" type="button">Validate</button>
+            <button class="delivery-tab" id="delivery-tab-button-handoff" data-delivery-tab="handoff" role="tab" aria-selected="false" aria-controls="delivery-tab-handoff" type="button">Handoff</button>
+          </nav>
+
+          <div class="delivery-tab-panel is-active" id="delivery-tab-inspect" data-delivery-panel="inspect" role="tabpanel" aria-labelledby="delivery-tab-button-inspect" tabindex="0">
+            <section class="panel inspection-workspace" id="inspection-workspace" aria-label="Authorized Inspection Workspace">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Authorized inspection</p>
+                  <h2>Inspect</h2>
+                </div>
+                <span id="inspection-package-status">Ready</span>
+              </div>
+              <div class="inspection-layout">
+                <div class="inspection-step-rail" id="inspection-step-rail" aria-label="Inspection steps">
+                  <button class="inspection-step-card" data-inspection-step="authorize" type="button" hidden></button>
+                  <button class="inspection-step-card" data-inspection-step="preflight" type="button" hidden></button>
+                  <button class="inspection-step-card" data-inspection-step="collect" type="button" hidden></button>
+                  <button class="inspection-step-card" data-inspection-step="analyze" type="button" hidden></button>
+                  <button class="inspection-step-card" data-inspection-step="package" type="button" hidden></button>
+                </div>
+                <aside class="inspection-evidence-panel" id="inspection-evidence-panel" aria-label="Inspection evidence"></aside>
+              </div>
+              <div class="inspection-package-bar">
+                <div>
+                  <span>Local package summary</span>
+                  <strong id="inspection-package-summary">No inspection loaded</strong>
+                </div>
+                <button class="secondary-action" id="inspection-package-button" type="button">Copy Summary</button>
+              </div>
+            </section>
+          </div>
+
+          <div class="delivery-tab-panel" id="delivery-tab-validate" data-delivery-panel="validate" role="tabpanel" aria-labelledby="delivery-tab-button-validate" tabindex="0" hidden>
+            <section class="panel release-hero" id="release-readiness-workspace" aria-label="Release readiness workspace">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Release readiness</p>
+                  <h2>Validate</h2>
+                </div>
+                <span id="release-mode-summary">Operator review</span>
+              </div>
+              <div class="release-mode-strip" aria-label="Release modes">
+                <button class="release-mode-card is-selected" data-release-mode-card="operator" type="button">
+                  <strong>Operator</strong>
+                  <span>Daily</span>
+                </button>
+                <button class="release-mode-card" data-release-mode-card="client-handoff" type="button">
+                  <strong>Client Handoff</strong>
+                  <span>Package</span>
+                </button>
+                <button class="release-mode-card" data-release-mode-card="incident-review" type="button">
+                  <strong>Incident Review</strong>
+                  <span>Evidence</span>
+                </button>
+              </div>
+              <div class="release-summary-grid" id="release-readiness-cards"></div>
+            </section>
+
+            <div class="release-grid lower-grid">
+              <section class="panel">
+                <div class="section-heading">
+                  <h2>Review Queue</h2>
+                  <span>Safe next actions</span>
+                </div>
+                <div class="release-review-queue" id="release-review-queue"></div>
+              </section>
+              <section class="panel">
+                <div class="section-heading">
+                  <h2>Reference Basis</h2>
+                  <span>Local GitHub worktrees</span>
+                </div>
+                <div class="release-reference-grid" id="release-reference-basis"></div>
+              </section>
+            </div>
+
+            <section class="panel release-safety-panel lower-grid">
+              <div class="section-heading">
+                <h2>Safety Ledger</h2>
+                <span>Commercial boundary</span>
+              </div>
+              <div class="release-safety-ledger" id="release-safety-ledger"></div>
+            </section>
+          </div>
+
+          <div class="delivery-tab-panel" id="delivery-tab-handoff" data-delivery-panel="handoff" role="tabpanel" aria-labelledby="delivery-tab-button-handoff" tabindex="0" hidden>
+            <section class="panel strategy-workspace" id="strategy-workspace" aria-label="10-cycle Strategy Iteration Workspace">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Delivery strategy</p>
+                  <h2>Handoff</h2>
+                </div>
+                <span id="strategy-copy-status">Ready</span>
+              </div>
+              <div class="strategy-layout">
+                <div>
+                  <div class="strategy-summary" id="strategy-summary">Loading 10-cycle strategy evidence</div>
+                  <div class="strategy-iteration-rail" id="strategy-iteration-rail"></div>
+                </div>
+                <aside class="strategy-evidence-panel" id="strategy-evidence-panel" aria-label="Strategy iteration evidence">
+                  <p class="muted">Select a strategy iteration to review plan, execution, validation, and evidence.</p>
+                </aside>
+              </div>
+              <div class="strategy-package-bar">
+                <div>
+                  <span>Reference basis</span>
+                  <strong id="strategy-reference-summary">Waiting for references</strong>
+                </div>
+                <button class="secondary-action" id="strategy-copy-button" type="button">Copy Strategy Summary</button>
+              </div>
+              <button class="strategy-iteration-card" data-strategy-iteration="strategy-01-baseline" type="button" hidden></button>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="reports-view">
+          <div class="section-heading">
+            <h2>Reports Center</h2>
+            <div class="topbar-actions">
+              <button class="secondary-action" id="status-page-button" type="button">Refresh Status</button>
+              <button class="secondary-action" id="export-report-button" type="button">Export Markdown</button>
+              <button class="secondary-action" id="export-runbook-button" type="button">Export Runbook</button>
+              <button class="primary-action" id="export-pdf-button" type="button">Export PDF</button>
+            </div>
+          </div>
+          <div class="report-center-grid">
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Report History</h2>
+                <span>Latest first</span>
+              </div>
+              <div class="report-history" id="report-history"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Risk Trend</h2>
+                <span>Score and findings</span>
+              </div>
+              <div class="risk-trend" id="risk-trend"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Report Compare</h2>
+                <span>Current vs previous</span>
+              </div>
+              <div class="report-comparison" id="report-comparison"></div>
+            </section>
+          </div>
+          <section class="panel status-page-panel">
+            <div class="section-heading">
+              <h2>Status Page Preview</h2>
+              <span>Local redacted summary</span>
+            </div>
+            <div class="status-page-preview" id="status-page-preview"></div>
+          </section>
+          <section class="panel report-evidence-panel">
+            <div class="section-heading">
+              <h2>Evidence Chain</h2>
+              <span>Report handoff path</span>
+            </div>
+            <div class="evidence-tracker" id="report-evidence-tracker" aria-label="Report evidence tracker"></div>
+          </section>
+          <article class="report-surface" id="report-surface"></article>
+        </section>
+
+        <section class="view" id="alerts-view">
+          <div class="section-heading">
+            <h2>Alert Inbox</h2>
+            <span id="alert-summary">0 unread</span>
+          </div>
+          <div class="alert-workspace">
+            <section class="panel wide-panel">
+              <div class="section-heading">
+                <h2>Local Notifications</h2>
+                <span>Critical and high findings</span>
+              </div>
+              <div class="alert-inbox" id="alert-inbox"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Rules</h2>
+                <span>Local only</span>
+              </div>
+              <div class="kv-list">
+                <div class="kv-row"><span>Delivery</span><strong>Inbox</strong></div>
+                <div class="kv-row"><span>External calls</span><strong>Disabled</strong></div>
+                <div class="kv-row"><span>Status</span><strong id="alert-rule-status">Enabled</strong></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view interaction-studio" id="interaction-view">
+          <section class="panel interaction-hero" id="interaction-studio" aria-label="Interaction Studio">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">ServerLens 10.0</p>
+                <h2>Interaction Studio</h2>
+              </div>
+              <span>Touch</span>
+            </div>
+            <div class="interaction-swipe-rail" id="interaction-swipe-rail" aria-label="Tactile action cards">
+              <button class="tactile-card" data-tactile-card data-view="servers" type="button">
+                <span>Fleet</span>
+                <strong>Swipe assets</strong>
+                <small>Status</small>
+              </button>
+              <button class="tactile-card" data-tactile-card data-view="analysis" type="button">
+                <span>Analyze</span>
+                <strong>Build run</strong>
+                <small>Scope</small>
+              </button>
+              <button class="tactile-card" data-tactile-card data-view="reports" type="button">
+                <span>Evidence</span>
+                <strong>Open reports</strong>
+                <small>Exports</small>
+              </button>
+              <button class="tactile-card" data-tactile-card data-view="release" type="button">
+                <span>Release</span>
+                <strong>Handoff mode</strong>
+                <small>Ready</small>
+              </button>
+              <button class="tactile-card" data-tactile-card data-focus-peek="active-server" type="button">
+                <span>Peek</span>
+                <strong>Focus card</strong>
+                <small>Inspect</small>
+              </button>
+              <button class="tactile-card" data-tactile-card data-action-dock-command="open-dock" type="button">
+                <span>Dock</span>
+                <strong>Action sheet</strong>
+                <small>Actions</small>
+              </button>
+            </div>
+          </section>
+
+          <section class="panel experience-deck-panel lower-grid" id="experience-deck" aria-label="Experience Deck">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Client walkthrough</p>
+                <h2>Experience Deck</h2>
+              </div>
+              <span id="experience-mode-summary">Standard motion, comfortable density</span>
+            </div>
+            <div class="experience-toolbar">
+              <div class="experience-control-group" id="experience-motion-control" aria-label="Motion intensity">
+                <span>Motion</span>
+                <button class="segmented" data-motion-intensity="calm" type="button">Calm</button>
+                <button class="segmented" data-motion-intensity="standard" type="button">Standard</button>
+                <button class="segmented" data-motion-intensity="expressive" type="button">Expressive</button>
+              </div>
+              <div class="experience-control-group" id="experience-density-control" aria-label="Card density">
+                <span>Density</span>
+                <button class="segmented" data-card-density="compact" type="button">Compact</button>
+                <button class="segmented" data-card-density="comfortable" type="button">Comfortable</button>
+              </div>
+              <button class="secondary-action" id="experience-presentation-toggle" aria-pressed="false" type="button">Presentation</button>
+            </div>
+            <div class="experience-stepper" id="experience-stepper" aria-label="Experience walkthrough steps">
+              <button class="experience-step-button" data-experience-step="prepare" type="button">Prepare</button>
+              <button class="experience-step-button" data-experience-step="inspect" type="button">Inspect</button>
+              <button class="experience-step-button" data-experience-step="analyze" type="button">Analyze</button>
+              <button class="experience-step-button" data-experience-step="report" type="button">Report</button>
+              <button class="experience-step-button" data-experience-step="release" type="button">Release</button>
+            </div>
+            <div class="experience-stage" id="experience-stage"></div>
+            <div class="experience-progress-dots" id="experience-progress-dots" aria-label="Experience progress"></div>
+          </section>
+
+          <section class="panel scenario-board-panel lower-grid" id="scenario-board" aria-label="Scenario Board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Operator scenarios</p>
+                <h2>Scenario Board</h2>
+              </div>
+              <span class="scenario-copy-status" id="scenario-copy-status">Ready</span>
+            </div>
+            <div class="scenario-hotkey-strip" id="scenario-hotkey-strip" aria-label="Scenario shortcuts">
+              <span class="scenario-hotkey">1 Fleet</span>
+              <span class="scenario-hotkey">2 Security</span>
+              <span class="scenario-hotkey">3 Runtime</span>
+              <span class="scenario-hotkey">4 Handoff</span>
+              <span class="scenario-hotkey">5 Release</span>
+            </div>
+            <div class="scenario-board-layout">
+              <div class="scenario-card-grid" id="scenario-card-grid"></div>
+              <aside class="scenario-inspector" id="scenario-inspector" aria-label="Scenario inspector">
+                <p class="muted">Select a scenario to review safe next actions.</p>
+              </aside>
+            </div>
+            <button class="secondary-action" id="scenario-copy-button" type="button">Copy Scenario Summary</button>
+            <button class="scenario-card" data-scenario-card="fleet-triage" type="button" hidden></button>
+            <button class="scenario-card" data-scenario-card="security-review" type="button" hidden></button>
+            <button class="scenario-card" data-scenario-card="runtime-pressure" type="button" hidden></button>
+            <button class="scenario-card" data-scenario-card="client-handoff" type="button" hidden></button>
+            <button class="scenario-card" data-scenario-card="release-audit" type="button" hidden></button>
+          </section>
+
+          <div class="interaction-grid lower-grid">
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Touch Queue</h2>
+                <span>Swipe, press, route</span>
+              </div>
+              <div class="touch-queue" id="touch-queue"></div>
+            </section>
+            <section class="panel">
+              <div class="section-heading">
+                <h2>Focus Peek</h2>
+                <span>Current context</span>
+              </div>
+              <div class="focus-peek-inline" id="focus-peek-inline"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="settings-view">
+          <div class="section-heading">
+            <h2>Settings</h2>
+            <span>Local delivery controls</span>
+          </div>
+          <form class="settings-form panel" id="settings-form">
+            <label>
+              CPU high threshold
+              <input name="cpuHigh" type="number" min="1" max="100">
+            </label>
+            <label>
+              Memory high threshold
+              <input name="memoryHigh" type="number" min="1" max="100">
+            </label>
+            <label>
+              Disk critical threshold
+              <input name="diskCritical" type="number" min="1" max="100">
+            </label>
+            <label>
+              Load high threshold
+              <input name="loadHigh" type="number" min="1" max="64" step="0.1">
+            </label>
+            <label>
+              Data retention days
+              <input name="retentionDays" type="number" min="1" max="365">
+            </label>
+            <label class="toggle-field">
+              Local-only alerts
+              <input name="localOnly" type="checkbox">
+            </label>
+            <label class="toggle-field">
+              Alert inbox
+              <input name="inboxEnabled" type="checkbox">
+            </label>
+            <label>
+              Alert severities
+              <select name="alertSeverities" multiple size="2">
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label class="toggle-field">
+              AI summary
+              <input name="aiSummaryEnabled" type="checkbox">
+            </label>
+            <fieldset class="settings-webhook" id="settings-webhook">
+              <legend>Outbound webhook (optional, off by default)</legend>
+              <p class="muted webhook-note">Disabled while Local-only alerts is on. Sends redacted alert metadata only — never raw logs or secrets.</p>
+              <label class="toggle-field">
+                Enable webhook
+                <input name="webhookEnabled" type="checkbox">
+              </label>
+              <label>
+                Webhook URL (https)
+                <input name="webhookUrl" type="url" autocomplete="off" placeholder="https://hooks.example.com/serverlens">
+              </label>
+              <label>
+                Minimum severity
+                <select name="webhookMinSeverity">
+                  <option value="critical">Critical</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </label>
+            </fieldset>
+            <button class="primary-action" type="submit">Save Settings</button>
+          </form>
+          <section class="panel retention-maintenance-panel">
+            <div class="section-heading">
+              <h2>Retention Maintenance</h2>
+              <span>Preserves current evidence</span>
+            </div>
+            <div class="maintenance-actions">
+              <button class="secondary-action" id="retention-run-button" type="button">Run Cleanup</button>
+              <span class="muted" id="retention-run-status" aria-live="polite">Not run in this session</span>
+            </div>
+            <div class="maintenance-result" id="retention-run-result"></div>
+          </section>
+          <section class="panel delivery-evidence-panel">
+            <div class="section-heading">
+              <h2>Delivery Evidence</h2>
+              <span>Local handoff manifest</span>
+            </div>
+            <button class="secondary-action" id="delivery-evidence-button" type="button">Load Evidence</button>
+            <div class="kv-list" id="delivery-evidence"></div>
+          </section>
+          <section class="panel delivery-readiness-panel">
+            <div class="section-heading">
+              <h2>Readiness Gate</h2>
+              <span>Commercial handoff checks</span>
+            </div>
+            <button class="secondary-action" id="delivery-readiness-button" type="button">Run Gate</button>
+            <div class="delivery-readiness" id="delivery-readiness"></div>
+          </section>
+          <section class="panel ui-experience-audit-panel">
+            <div class="section-heading">
+              <h2>UI Experience Audit</h2>
+              <span>Material, scroll, controls</span>
+            </div>
+            <button class="secondary-action" id="ui-experience-audit-button" type="button">Run UI Audit</button>
+            <div class="ui-experience-audit" id="ui-experience-audit"></div>
+          </section>
+          <section class="panel handoff-checklist-panel">
+            <div class="section-heading">
+              <h2>Handoff Checklist</h2>
+              <span>First-run client review</span>
+            </div>
+            <button class="secondary-action" id="handoff-checklist-button" type="button">Open Checklist</button>
+            <div class="handoff-checklist" id="handoff-checklist"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <section class="command-palette" id="command-palette" aria-label="Command palette" hidden>
+      <div class="command-scrim" data-command-close></div>
+      <div class="command-panel" role="dialog" aria-modal="true" aria-labelledby="command-palette-title">
+        <div class="command-search-row">
+          <div>
+            <p class="eyebrow">Command</p>
+            <h2 id="command-palette-title">Command Center</h2>
+          </div>
+          <button class="icon-action" data-command-close aria-label="Close" type="button">x</button>
+        </div>
+        <label class="command-search">
+          Search commands
+          <input id="command-input" autocomplete="off" placeholder="Jump, open, collect, analyze">
+        </label>
+        <div class="command-results" id="command-results" role="listbox" aria-label="Available commands"></div>
+      </div>
+    </section>
+
+    <section class="server-inspector" id="server-inspector" aria-label="Server inspector" hidden>
+      <div class="inspector-scrim" data-inspector-close></div>
+      <aside class="inspector-panel" role="dialog" aria-modal="true" aria-labelledby="server-inspector-title">
+        <div class="inspector-header">
+          <div>
+            <p class="eyebrow">Inspector</p>
+            <h2 id="server-inspector-title">Server Inspector</h2>
+          </div>
+          <button class="icon-action" data-inspector-close aria-label="Close inspector" type="button">x</button>
+        </div>
+        <div class="inspector-content" id="server-inspector-content"></div>
+      </aside>
+    </section>
+
+    <section class="action-dock" id="action-dock" aria-label="Action Dock" hidden>
+      <div class="dock-scrim" data-action-dock-close></div>
+      <aside class="action-dock-panel" role="dialog" aria-modal="true" aria-labelledby="action-dock-title">
+        <button class="action-dock-handle" data-action-dock-handle aria-label="Resize Action Dock" type="button"></button>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Actions</p>
+            <h2 id="action-dock-title">Action Dock</h2>
+          </div>
+          <button class="icon-action" data-action-dock-close aria-label="Close Action Dock" type="button">x</button>
+        </div>
+        <div class="dock-command-grid" id="dock-command-grid"></div>
+      </aside>
+    </section>
+
+    <section class="focus-peek" id="focus-peek" aria-label="Focus Peek" hidden>
+      <div class="focus-peek-panel" role="dialog" aria-modal="false" aria-labelledby="focus-peek-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Context</p>
+            <h2 id="focus-peek-title">Focus Peek</h2>
+          </div>
+          <button class="icon-action" data-focus-peek-close aria-label="Close Focus Peek" type="button">x</button>
+        </div>
+        <div id="focus-peek-content"></div>
+      </div>
+    </section>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+roadmap: v60-ios-shadcn-konsta-redesign
+items:
+  - slug: v60-reference-basis
+    status: done
+    description: Pull shadcn/ui and Konsta locally and document their role for ServerLens 6.0.
+    feature: .codestable/features/2026-06-09-v60-ios-shadcn-konsta-redesign/v60-ios-shadcn-konsta-redesign-ff-note.md
+  - slug: v60-visual-system
+    status: done
+    description: Replace the prior material direction with quiet iOS surface tokens and shadcn/Konsta component contracts.
+    feature: .codestable/features/2026-06-09-v60-ios-shadcn-konsta-redesign/v60-ios-shadcn-konsta-redesign-ff-note.md
+  - slug: v60-contracts
+    status: done
+    description: Update tests, build guardrails, readiness evidence, and handoff paths for version 6.0.0.
+    feature: .codestable/features/2026-06-09-v60-ios-shadcn-konsta-redesign/v60-ios-shadcn-konsta-redesign-ff-note.md
+  - slug: v60-delivery-validation
+    status: done
+    description: Run source and D-drive delivery validation for the final 6.0.0 app package.
+    feature: .codestable/features/2026-06-09-v60-ios-shadcn-konsta-redesign/v60-ios-shadcn-konsta-redesign-ff-note.md
