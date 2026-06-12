@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Test & build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Tests and the build check use only Node.js built-ins (node:test,
+      # node:sqlite, node:crypto) and project source — no npm install needed.
+      # The dev tooling (electron, playwright) is only used by smoke/package/
+      # ui:evidence, which require a desktop renderer and are run locally.
+      - name: Run tests
+        run: npm test
+
+      - name: Run build check
+        run: npm run build
