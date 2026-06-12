@@ -6,6 +6,11 @@
   "main": "src/desktop/main.cjs",
   "author": "ServerLens Delivery",
   "description": "A RetroUI-inspired server health, runtime, security, and ecosystem analysis desktop app.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jiashui2003/server_app.git"
+  },
   "scripts": {
     "start": "node src/server/index.js",
     "desktop": "electron .",
