@@ -13,7 +13,7 @@ const evidenceDir = path.join(projectRoot, 'dist', 'ui-evidence');
 const evidencePath = path.join(projectRoot, 'dist', 'ui-visual-evidence.json');
 const desktopShot = path.join(evidenceDir, 'ui-evidence-desktop.png');
 const mobileShot = path.join(evidenceDir, 'ui-evidence-mobile.png');
-const pageViews = ['overview', 'servers', 'server-detail', 'analysis', 'inspection', 'strategy', 'reports', 'alerts', 'release', 'interaction', 'settings'];
+const pageViews = ['overview', 'servers', 'server-detail', 'analysis', 'inspection', 'strategy', 'reports', 'alerts', 'release', 'ecosystem', 'settings'];
 // The 14.0 Delivery Workspace folds inspection/strategy/release into one tabbed
 // `delivery` view. Map those conceptual surfaces to the delivery tab that
 // exposes them so screenshot evidence still covers every surface.
@@ -157,16 +157,9 @@ async function capturePlaywrightViewport(browser, url, options) {
   await page.click('[data-view="delivery"]');
   await page.click('[data-delivery-tab="validate"]');
   await page.waitForSelector('#release-readiness-cards .release-readiness-card', { timeout: 8000 });
-  await page.click('[data-view="interaction"]');
+  await page.click('[data-view="ecosystem"]');
   await page.waitForSelector('#interaction-swipe-rail .tactile-card', { timeout: 8000 });
-  await page.waitForSelector('#experience-deck .experience-card', { timeout: 8000 });
-  await page.click('[data-experience-step="release"]');
-  await page.click('[data-motion-intensity="calm"]');
-  await page.click('[data-card-density="compact"]');
-  await page.click('#experience-presentation-toggle');
-  await page.waitForSelector('#scenario-card-grid .scenario-card', { timeout: 8000 });
-  await page.click('[data-scenario-card="security-review"]');
-  await page.click('[data-scenario-pin="security-review"]');
+  await page.waitForSelector('#eco-resource .eco-metric-row', { timeout: 8000 });
   await page.click('[data-view="delivery"]');
   await page.click('[data-delivery-tab="inspect"]');
   await page.waitForSelector('#inspection-step-rail .inspection-step-card', { timeout: 8000 });
@@ -189,18 +182,9 @@ async function capturePlaywrightViewport(browser, url, options) {
       readinessPresent: Boolean(document.querySelector('#delivery-readiness-button')),
       releaseWorkspacePresent: Boolean(document.querySelector('#release-readiness-workspace')),
       releaseCardsPresent: document.querySelectorAll('#release-readiness-cards .release-readiness-card').length === 6,
-      interactionStudioPresent: Boolean(document.querySelector('#interaction-studio')),
-      experienceDeckPresent: Boolean(document.querySelector('#experience-deck .experience-card')) &&
-        Boolean(document.querySelector('#experience-stepper')),
-      experienceControlsPresent: Boolean(document.querySelector('#experience-motion-control')) &&
-        Boolean(document.querySelector('#experience-density-control')) &&
-        Boolean(document.querySelector('#experience-presentation-toggle')) &&
-        document.querySelectorAll('#experience-progress-dots .experience-progress-dot').length === 5,
-      scenarioBoardPresent: Boolean(document.querySelector('#scenario-board')),
-      scenarioCardsPresent: document.querySelectorAll('#scenario-card-grid .scenario-card').length === 5,
-      scenarioInspectorPresent: Boolean(document.querySelector('#scenario-inspector')) &&
-        Boolean(document.querySelector('#scenario-copy-button')) &&
-        Boolean(document.querySelector('#scenario-copy-status')),
+      ecosystemViewPresent: Boolean(document.querySelector('#ecosystem-view')),
+      ecosystemPanelsPresent: document.querySelectorAll('#eco-resource, #eco-services, #eco-containers, #eco-exposure, #eco-risk, #eco-freshness').length === 6,
+      ecosystemResourcePopulated: document.querySelectorAll('#eco-resource .eco-metric-row').length >= 1,
       inspectionWorkspacePresent: Boolean(document.querySelector('#inspection-workspace')),
       inspectionCardsPresent: document.querySelectorAll('#inspection-step-rail .inspection-step-card').length === 5,
       inspectionEvidencePresent: Boolean(document.querySelector('#inspection-evidence-panel')) &&
@@ -505,12 +489,9 @@ async function runSystemBrowserStaticSnapshotEvidence(browserPath) {
     readinessPresent: true,
     releaseWorkspacePresent: true,
     releaseCardsPresent: true,
-    interactionStudioPresent: true,
-    experienceDeckPresent: true,
-    experienceControlsPresent: true,
-    scenarioBoardPresent: true,
-    scenarioCardsPresent: true,
-    scenarioInspectorPresent: true,
+    ecosystemViewPresent: true,
+    ecosystemPanelsPresent: true,
+    ecosystemResourcePopulated: true,
     inspectionWorkspacePresent: true,
     inspectionCardsPresent: true,
     inspectionEvidencePresent: true,
@@ -609,12 +590,9 @@ async function captureBrowserCliViewport(browserPath, url, options) {
           readinessPresent: options.contract.readinessPresent,
           releaseWorkspacePresent: options.contract.releaseWorkspacePresent,
           releaseCardsPresent: options.contract.releaseCardsPresent,
-          interactionStudioPresent: options.contract.interactionStudioPresent,
-          experienceDeckPresent: options.contract.experienceDeckPresent,
-          experienceControlsPresent: options.contract.experienceControlsPresent,
-          scenarioBoardPresent: options.contract.scenarioBoardPresent,
-          scenarioCardsPresent: options.contract.scenarioCardsPresent,
-          scenarioInspectorPresent: options.contract.scenarioInspectorPresent,
+          ecosystemViewPresent: options.contract.ecosystemViewPresent,
+          ecosystemPanelsPresent: options.contract.ecosystemPanelsPresent,
+          ecosystemResourcePopulated: options.contract.ecosystemResourcePopulated,
           inspectionWorkspacePresent: options.contract.inspectionWorkspacePresent,
           inspectionCardsPresent: options.contract.inspectionCardsPresent,
           inspectionEvidencePresent: options.contract.inspectionEvidencePresent,
@@ -653,25 +631,15 @@ async function inspectStaticUiContract(url) {
     readinessPresent: html.includes('delivery-readiness-button') && js.includes('renderDeliveryReadiness'),
     releaseWorkspacePresent: html.includes('release-readiness-workspace') && js.includes('renderReleaseWorkspace'),
     releaseCardsPresent: html.includes('release-readiness-cards') && css.includes('.release-readiness-card'),
-    interactionStudioPresent: html.includes('interaction-studio') && js.includes('renderInteractionStudio'),
-    experienceDeckPresent: html.includes('experience-deck') &&
-      html.includes('experience-stepper') &&
-      js.includes('renderExperienceDeck') &&
-      css.includes('.experience-card'),
-    experienceControlsPresent: html.includes('experience-motion-control') &&
-      html.includes('experience-density-control') &&
-      html.includes('experience-presentation-toggle') &&
-      js.includes('setMotionIntensity') &&
-      js.includes('setCardDensity') &&
-      css.includes('.experience-progress-dot'),
-    scenarioBoardPresent: html.includes('scenario-board') && js.includes('renderScenarioBoard') && css.includes('.scenario-board-panel'),
-    scenarioCardsPresent: html.includes('data-scenario-card="fleet-triage"') &&
-      js.includes('scenarioBoardItems') &&
-      css.includes('.scenario-card.is-selected'),
-    scenarioInspectorPresent: html.includes('scenario-inspector') &&
-      html.includes('scenario-copy-button') &&
-      js.includes('copyScenarioSummary') &&
-      css.includes('.scenario-inspector'),
+    ecosystemViewPresent: html.includes('id="ecosystem-view"') && js.includes('renderEcosystem'),
+    ecosystemPanelsPresent: html.includes('id="eco-resource"') &&
+      html.includes('id="eco-services"') &&
+      html.includes('id="eco-containers"') &&
+      html.includes('id="eco-exposure"') &&
+      html.includes('id="eco-risk"') &&
+      html.includes('id="eco-freshness"') &&
+      css.includes('.ecosystem-panel'),
+    ecosystemResourcePopulated: js.includes('/api/ecosystem/overview') && js.includes('state.ecosystem'),
     inspectionWorkspacePresent: html.includes('inspection-workspace') &&
       js.includes('renderInspectionWorkspace') &&
       css.includes('.inspection-workspace'),
@@ -1190,12 +1158,9 @@ function visualEvidenceFromCaptures({ browser, captures, notes = [] }) {
     commandCenterPresent: item.commandCenterPresent,
     releaseWorkspacePresent: item.releaseWorkspacePresent,
     releaseCardsPresent: item.releaseCardsPresent,
-    interactionStudioPresent: item.interactionStudioPresent,
-    experienceDeckPresent: item.experienceDeckPresent,
-    experienceControlsPresent: item.experienceControlsPresent,
-    scenarioBoardPresent: item.scenarioBoardPresent,
-    scenarioCardsPresent: item.scenarioCardsPresent,
-    scenarioInspectorPresent: item.scenarioInspectorPresent,
+    ecosystemViewPresent: item.ecosystemViewPresent,
+    ecosystemPanelsPresent: item.ecosystemPanelsPresent,
+    ecosystemResourcePopulated: item.ecosystemResourcePopulated,
     inspectionWorkspacePresent: item.inspectionWorkspacePresent,
     inspectionCardsPresent: item.inspectionCardsPresent,
     inspectionEvidencePresent: item.inspectionEvidencePresent,
@@ -1221,12 +1186,9 @@ function visualEvidenceFromCaptures({ browser, captures, notes = [] }) {
     !check.commandCenterPresent ||
     !check.releaseWorkspacePresent ||
     !check.releaseCardsPresent ||
-    !check.interactionStudioPresent ||
-    !check.experienceDeckPresent ||
-    !check.experienceControlsPresent ||
-    !check.scenarioBoardPresent ||
-    !check.scenarioCardsPresent ||
-    !check.scenarioInspectorPresent ||
+    !check.ecosystemViewPresent ||
+    !check.ecosystemPanelsPresent ||
+    !check.ecosystemResourcePopulated ||
     !check.inspectionWorkspacePresent ||
     !check.inspectionCardsPresent ||
     !check.inspectionEvidencePresent ||
@@ -1359,18 +1321,9 @@ function inspectPage() {
     readinessPresent: Boolean(document.querySelector('#delivery-readiness-button')),
     releaseWorkspacePresent: Boolean(document.querySelector('#release-readiness-workspace')),
     releaseCardsPresent: document.querySelectorAll('#release-readiness-cards .release-readiness-card').length === 6,
-    interactionStudioPresent: Boolean(document.querySelector('#interaction-studio')),
-    experienceDeckPresent: Boolean(document.querySelector('#experience-deck .experience-card')) &&
-      Boolean(document.querySelector('#experience-stepper')),
-    experienceControlsPresent: Boolean(document.querySelector('#experience-motion-control')) &&
-      Boolean(document.querySelector('#experience-density-control')) &&
-      Boolean(document.querySelector('#experience-presentation-toggle')) &&
-      document.querySelectorAll('#experience-progress-dots .experience-progress-dot').length === 5,
-    scenarioBoardPresent: Boolean(document.querySelector('#scenario-board')),
-    scenarioCardsPresent: document.querySelectorAll('#scenario-card-grid .scenario-card').length === 5,
-    scenarioInspectorPresent: Boolean(document.querySelector('#scenario-inspector')) &&
-      Boolean(document.querySelector('#scenario-copy-button')) &&
-      Boolean(document.querySelector('#scenario-copy-status')),
+    ecosystemViewPresent: Boolean(document.querySelector('#ecosystem-view')),
+    ecosystemPanelsPresent: document.querySelectorAll('#eco-resource, #eco-services, #eco-containers, #eco-exposure, #eco-risk, #eco-freshness').length === 6,
+    ecosystemResourcePopulated: document.querySelectorAll('#eco-resource .eco-metric-row').length >= 1,
     inspectionWorkspacePresent: Boolean(document.querySelector('#inspection-workspace')),
     inspectionCardsPresent: document.querySelectorAll('#inspection-step-rail .inspection-step-card').length === 5,
     inspectionEvidencePresent: Boolean(document.querySelector('#inspection-evidence-panel')) &&

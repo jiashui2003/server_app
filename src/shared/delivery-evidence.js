@@ -31,9 +31,8 @@ export function buildDeliveryEvidence(options = {}) {
       'local UI visual evidence for desktop and mobile screenshot review',
       'commercial interaction polish with card run builder, evidence tracker, and server inspector',
       'release readiness workspace for client handoff review',
-      'iOS-inspired Interaction Studio with tactile cards, swipe rail, Action Dock, and Focus Peek',
-      'guided Experience Deck for client walkthrough, presentation mode, motion intensity, and density controls',
-      'Scenario Board with selectable cards, pinned scenarios, copyable summaries, and keyboard shortcuts',
+      'real-time fleet ecosystem overview aggregating resource pressure, services, containers, exposure, risk, and freshness from collected telemetry',
+      'iOS-inspired action layer with tactile navigation cards, Action Dock, and Focus Peek',
       'Authorized Inspection Workspace with guided preflight, collection, analysis, and package evidence',
       '10-cycle Strategy Iteration Workspace with plan, execution, validation, and handoff evidence',
       'ServerLens 9.0 RetroUI Card clarity redesign with simplified topbar, quieter reference strip, three-signal live monitor, compact cards, scroll-safe workspaces, and wrapped evidence text',
@@ -116,7 +115,7 @@ export function buildPageExperienceReadiness(options = {}) {
     pageExperience('reports', 'Reports', 'Review and export evidence', 'Report history, trend comparison, status page preview, markdown/PDF/runbook actions', 'Export the required handoff artifact.'),
     pageExperience('alerts', 'Alerts', 'Triage local alert inbox', 'Alert summary, acknowledgement actions, finding commands, severity filters', 'Acknowledge reviewed alerts or jump to the related report.'),
     pageExperience('release', 'Release Readiness', 'Validate publishable package state', 'Mode cards, readiness cards, review queue, reference basis, safety ledger', 'Run delivery validation before packaging handoff.'),
-    pageExperience('interaction', 'Interaction Studio', 'Tune walkthrough interaction', 'Swipe rail, Experience Deck, Scenario Board, motion, density, presentation toggle', 'Select a scenario and use Action Dock for the next review step.'),
+    pageExperience('ecosystem', 'Ecosystem', 'Review real-time fleet ecosystem', 'Resource pressure, service ecosystem, container fleet, exposure surface, risk distribution, and freshness trend', 'Collect telemetry on more servers to enrich the fleet aggregation.'),
     pageExperience('settings', 'Settings', 'Review local delivery controls', 'Thresholds, local-only notification settings, retention, evidence, readiness, checklist, UI audit', 'Run readiness and handoff checklist before client delivery.')
   ];
   const summary = pages.reduce((acc, page) => {
@@ -127,7 +126,7 @@ export function buildPageExperienceReadiness(options = {}) {
   return {
     product: 'ServerLens',
     mode: 'local-page-experience-readiness',
-    versionTarget: '15.0.0',
+    versionTarget: '16.0.0',
     generatedAt,
     status: summary.blocked > 0 ? 'blocked' : summary.review > 0 ? 'review' : 'ready',
     summary,
@@ -252,36 +251,25 @@ export function buildUiExperienceAudit(options = {}) {
       ]
     ),
     uiCheck(
-      'controls.interaction-studio',
+      'controls.ecosystem-overview',
       'controls',
-      'Interaction Studio, Action Dock, and Focus Peek are declared and guarded',
+      'Real-time fleet ecosystem overview is declared and guarded',
       true,
       [
-        'public/index.html: Interaction Studio, Action Dock, Focus Peek',
-        'public/app.js: renderInteractionStudio, renderActionDock, renderFocusPeek, bindTactileCards, bindSwipeRails',
+        'public/index.html: Ecosystem view with resource, services, containers, exposure, risk, and freshness panels',
+        'public/app.js: renderEcosystem, /api/ecosystem/overview fetch on the live poll loop',
+        'public/styles.css: ecosystem grid, metric rows, role rows, stat grid, hotspot, and trend states'
+      ]
+    ),
+    uiCheck(
+      'controls.action-layer',
+      'controls',
+      'Tactile navigation cards, Action Dock, and Focus Peek are declared and guarded',
+      true,
+      [
+        'public/index.html: tactile navigation rail, Action Dock, Focus Peek',
+        'public/app.js: renderActionDock, renderFocusPeek, bindTactileCards, bindSwipeRails',
         'public/styles.css: tactile-card press feedback, scroll-snap rail, spring-like Action Dock'
-      ]
-    ),
-    uiCheck(
-      'controls.experience-deck',
-      'controls',
-      'Experience Deck supports guided walkthrough controls',
-      true,
-      [
-        'public/index.html: Experience Deck, stepper, motion control, density control, and presentation toggle',
-        'public/app.js: renderExperienceDeck, setExperienceStep, setMotionIntensity, setCardDensity, togglePresentationMode',
-        'public/styles.css: selected states, progress dots, reduced-motion rules, and compact density rules'
-      ]
-    ),
-    uiCheck(
-      'controls.scenario-board',
-      'controls',
-      'Scenario Board supports card selection, pinning, keyboard shortcuts, and copy feedback',
-      true,
-      [
-        'public/index.html: Scenario Board, scenario cards, inspector, copy button, and hotkey strip',
-        'public/app.js: renderScenarioBoard, setActiveScenario, toggleScenarioPin, copyScenarioSummary',
-        'public/styles.css: selected, pinned, inspector, copy status, and mobile no-overflow states'
       ]
     ),
     uiCheck(
@@ -455,24 +443,17 @@ export function buildDeliveryReadiness(options = {}) {
       evidence.capabilities
     ),
     check(
-      'capabilities.interaction-studio',
+      'capabilities.ecosystem-overview',
       'commercial-capabilities',
-      'Interaction Studio and iOS-inspired action layer are included',
-      evidence.capabilities.includes('iOS-inspired Interaction Studio with tactile cards, swipe rail, Action Dock, and Focus Peek'),
+      'Real-time fleet ecosystem overview is included',
+      evidence.capabilities.includes('real-time fleet ecosystem overview aggregating resource pressure, services, containers, exposure, risk, and freshness from collected telemetry'),
       evidence.capabilities
     ),
     check(
-      'capabilities.experience-deck',
+      'capabilities.action-layer',
       'commercial-capabilities',
-      'Guided Experience Deck is included',
-      evidence.capabilities.includes('guided Experience Deck for client walkthrough, presentation mode, motion intensity, and density controls'),
-      evidence.capabilities
-    ),
-    check(
-      'capabilities.scenario-board',
-      'commercial-capabilities',
-      'Scenario Board is included',
-      evidence.capabilities.includes('Scenario Board with selectable cards, pinned scenarios, copyable summaries, and keyboard shortcuts'),
+      'iOS-inspired action layer is included',
+      evidence.capabilities.includes('iOS-inspired action layer with tactile navigation cards, Action Dock, and Focus Peek'),
       evidence.capabilities
     ),
     check(
@@ -557,7 +538,7 @@ export function buildDeliveryReadiness(options = {}) {
       'Operator workflows are available in the app shell',
       true,
       [
-        'Server inventory, analysis, inspection, strategy, reports, alerts, release, interaction, settings',
+        'Server inventory, analysis, inspection, strategy, reports, alerts, release, ecosystem, settings',
         'Command Center, status preview, delivery evidence, readiness gate, release readiness workspace, Action Dock'
       ]
     )

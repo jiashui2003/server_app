@@ -1,6 +1,6 @@
 {
   "name": "vibe-server-status-app",
-  "version": "15.0.0",
+  "version": "16.0.0",
   "private": true,
   "type": "module",
   "main": "src/desktop/main.cjs",

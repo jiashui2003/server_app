@@ -45,21 +45,14 @@ const state = {
   actionDockSnap: 'compact',
   focusPeekOpen: false,
   focusPeekContext: 'active-server',
-  experienceStep: 'prepare',
-  motionIntensity: 'standard',
-  cardDensity: 'comfortable',
-  presentationMode: false,
-  activeScenarioId: 'fleet-triage',
-  pinnedScenarioIds: ['fleet-triage'],
-  scenarioCopyStatus: 'Ready',
   activeInspectionStep: 'authorize',
   inspectionPackageStatus: 'Ready',
   activeStrategyIteration: 'strategy-01-baseline',
   strategyCopyStatus: 'Ready',
+  ecosystem: null,
   liveMonitoring: true,
   refreshInFlight: false,
-  lastRefreshAt: null,
-  monitorTick: 0
+  lastRefreshAt: null
 };
 
 const pageOperationSummary = document.querySelector('#page-operation-summary');
@@ -187,16 +180,6 @@ const dockCommandGrid = document.querySelector('#dock-command-grid');
 const focusPeek = document.querySelector('#focus-peek');
 const focusPeekContent = document.querySelector('#focus-peek-content');
 const focusPeekInline = document.querySelector('#focus-peek-inline');
-const touchQueue = document.querySelector('#touch-queue');
-const experienceModeSummary = document.querySelector('#experience-mode-summary');
-const experienceStage = document.querySelector('#experience-stage');
-const experienceProgressDots = document.querySelector('#experience-progress-dots');
-const experiencePresentationToggle = document.querySelector('#experience-presentation-toggle');
-const scenarioCardGrid = document.querySelector('#scenario-card-grid');
-const scenarioInspector = document.querySelector('#scenario-inspector');
-const scenarioCopyButton = document.querySelector('#scenario-copy-button');
-const scenarioCopyStatus = document.querySelector('#scenario-copy-status');
-const scenarioHotkeyStrip = document.querySelector('#scenario-hotkey-strip');
 const inspectionStepRail = document.querySelector('#inspection-step-rail');
 const inspectionEvidencePanel = document.querySelector('#inspection-evidence-panel');
 const inspectionPackageButton = document.querySelector('#inspection-package-button');
@@ -243,20 +226,6 @@ document.querySelectorAll('[data-release-mode-card]').forEach((button) => {
   });
 });
 
-document.querySelectorAll('[data-experience-step]').forEach((button) => {
-  button.addEventListener('click', () => setExperienceStep(button.dataset.experienceStep));
-});
-
-document.querySelectorAll('[data-motion-intensity]').forEach((button) => {
-  button.addEventListener('click', () => setMotionIntensity(button.dataset.motionIntensity));
-});
-
-document.querySelectorAll('[data-card-density]').forEach((button) => {
-  button.addEventListener('click', () => setCardDensity(button.dataset.cardDensity));
-});
-
-experiencePresentationToggle.addEventListener('click', () => togglePresentationMode());
-scenarioCopyButton.addEventListener('click', () => copyScenarioSummary());
 inspectionPackageButton.addEventListener('click', () => copyInspectionPackageSummary());
 strategyCopyButton.addEventListener('click', () => copyStrategySummary());
 
@@ -299,18 +268,6 @@ document.querySelectorAll('[data-analysis-output-card]').forEach((button) => {
 });
 
 document.addEventListener('click', (event) => {
-  const scenarioPin = event.target.closest('[data-scenario-pin]');
-  if (scenarioPin) {
-    event.preventDefault();
-    event.stopPropagation();
-    toggleScenarioPin(scenarioPin.dataset.scenarioPin);
-    return;
-  }
-  const scenarioCard = event.target.closest('[data-scenario-card]');
-  if (scenarioCard && scenarioCard.id !== 'scenario-copy-button') {
-    setActiveScenario(scenarioCard.dataset.scenarioCard);
-    return;
-  }
   const inspectionStep = event.target.closest('[data-inspection-step]');
   if (inspectionStep) {
     setInspectionStep(inspectionStep.dataset.inspectionStep);
@@ -319,11 +276,6 @@ document.addEventListener('click', (event) => {
   const strategyIteration = event.target.closest('[data-strategy-iteration]');
   if (strategyIteration) {
     setStrategyIteration(strategyIteration.dataset.strategyIteration);
-    return;
-  }
-  const experienceStepTrigger = event.target.closest('[data-experience-step]');
-  if (experienceStepTrigger) {
-    setExperienceStep(experienceStepTrigger.dataset.experienceStep);
     return;
   }
   const targetCard = event.target.closest('[data-analysis-target-card]');
@@ -575,123 +527,7 @@ document.addEventListener('keydown', async (event) => {
   if (event.key === 'Escape' && state.focusPeekOpen) {
     closeFocusPeek();
   }
-  if (state.activeView === 'interaction' && /^[1-5]$/.test(event.key) && !isTypingTarget(event.target)) {
-    event.preventDefault();
-    const scenario = scenarioBoardItems[Number(event.key) - 1];
-    if (scenario) setActiveScenario(scenario.id);
-  }
 });
-
-const experienceDeckSteps = [
-  {
-    id: 'prepare',
-    label: 'Prepare',
-    title: 'Prepare the authorized fleet',
-    metric: 'Assets',
-    detail: 'Confirm demo or approved SSH assets before any review.',
-    action: 'Open Servers',
-    view: 'servers',
-    evidence: ['No external discovery', 'Inventory transfer ready', 'Connection metadata visible']
-  },
-  {
-    id: 'inspect',
-    label: 'Inspect',
-    title: 'Inspect live status and source signals',
-    metric: 'Status',
-    detail: 'Review resource pressure, security events, topology, and source evidence.',
-    action: 'Open Detail',
-    view: 'server-detail',
-    evidence: ['Health ranking', 'Security source review', 'Runtime inventory']
-  },
-  {
-    id: 'analyze',
-    label: 'Analyze',
-    title: 'Run scoped defensive analysis',
-    metric: 'Modules',
-    detail: 'Select modules, depth, and time range before generating a local report.',
-    action: 'Open Analysis',
-    view: 'analysis',
-    evidence: ['Preset cards', 'Evidence tracker', 'Local rule engine']
-  },
-  {
-    id: 'report',
-    label: 'Report',
-    title: 'Review evidence-backed findings',
-    metric: 'Findings',
-    detail: 'Open report history, remediation checklist, runbook, and print-ready handoff.',
-    action: 'Open Reports',
-    view: 'reports',
-    evidence: ['Markdown export', 'Print/PDF handoff', 'Redacted appendix']
-  },
-  {
-    id: 'release',
-    label: 'Release',
-    title: 'Confirm package readiness',
-    metric: 'Gate',
-    detail: 'Validate references, safety boundary, UI evidence, package path, and handoff ledger.',
-    action: 'Open Release',
-    view: 'release',
-    evidence: ['Readiness gate', 'Delivery validation', 'D-drive package']
-  }
-];
-
-const scenarioBoardItems = [
-  {
-    id: 'fleet-triage',
-    hotkey: '1',
-    label: 'Fleet Triage',
-    tone: 'ready',
-    metric: 'Assets',
-    detail: 'Start with connection state, collection freshness, and highest-pressure server.',
-    view: 'servers',
-    action: 'Open Servers',
-    evidence: ['Reachable/demo assets', 'Health ranking', 'Collection status']
-  },
-  {
-    id: 'security-review',
-    hotkey: '2',
-    label: 'Security Review',
-    tone: 'review',
-    metric: 'Risk',
-    detail: 'Review defensive evidence for authentication spikes, public listeners, and source context.',
-    view: 'server-detail',
-    action: 'Open Detail',
-    evidence: ['Security events', 'Risk timeline', 'Source review']
-  },
-  {
-    id: 'runtime-pressure',
-    hotkey: '3',
-    label: 'Runtime Pressure',
-    tone: 'review',
-    metric: 'Load',
-    detail: 'Check CPU, memory, disk, IO, containers, services, and remediation commands.',
-    view: 'analysis',
-    action: 'Open Analysis',
-    evidence: ['Performance panel', 'Runtime inventory', 'Remediation checklist']
-  },
-  {
-    id: 'client-handoff',
-    hotkey: '4',
-    label: 'Client Handoff',
-    tone: 'ready',
-    metric: 'Package',
-    detail: 'Confirm local reports, runbook, screenshots, safety boundary, and copy-ready summary.',
-    view: 'reports',
-    action: 'Open Reports',
-    evidence: ['Markdown report', 'Runbook export', 'Visual evidence']
-  },
-  {
-    id: 'release-audit',
-    hotkey: '5',
-    label: 'Release Audit',
-    tone: 'ready',
-    metric: 'Gate',
-    detail: 'Review delivery validation, references, readiness status, and handoff package path.',
-    view: 'release',
-    action: 'Open Release',
-    evidence: ['Readiness gate', 'Reference basis', 'Validation ledger']
-  }
-];
 
 await refresh();
 setInterval(() => {
@@ -709,14 +545,15 @@ async function refresh(options = {}) {
       api('/api/settings'),
       api('/api/reports/summary')
     ]);
-    const [alerts, statusPage, deliveryEvidenceManifest, deliveryReadinessResult, handoffChecklistResult, inspectionWorkspaceResult, strategyWorkspaceResult] = await Promise.all([
+    const [alerts, statusPage, deliveryEvidenceManifest, deliveryReadinessResult, handoffChecklistResult, inspectionWorkspaceResult, strategyWorkspaceResult, ecosystemResult] = await Promise.all([
       api('/api/alerts'),
       api('/api/status-page'),
       api('/api/delivery/evidence'),
       api('/api/delivery/readiness'),
       api('/api/delivery/checklist'),
       api('/api/delivery/inspection'),
-      api('/api/delivery/strategy')
+      api('/api/delivery/strategy'),
+      api('/api/ecosystem/overview')
     ]);
     state.servers = servers;
     state.jobs = jobs;
@@ -729,8 +566,8 @@ async function refresh(options = {}) {
     state.handoffChecklist = handoffChecklistResult;
     state.inspectionWorkspace = inspectionWorkspaceResult;
     state.strategyWorkspace = strategyWorkspaceResult;
+    state.ecosystem = ecosystemResult;
     state.lastRefreshAt = new Date().toISOString();
-    state.monitorTick += 1;
     const active = activeServers();
     if ((!state.activeServerId || !active.some((server) => server.id === state.activeServerId)) && active.length > 0) {
       state.activeServerId = active[0].id;
@@ -874,9 +711,7 @@ function render() {
   renderSettings();
   renderAnalysisControls();
   renderReleaseWorkspace();
-  renderInteractionStudio();
-  renderExperienceDeck();
-  renderScenarioBoard();
+  renderEcosystem();
   renderInspectionWorkspace();
   renderStrategyWorkspace();
   renderActionDock();
@@ -1021,22 +856,28 @@ function renderLiveMonitor(snapshot, report) {
       detail: state.liveMonitoring ? 'auto' : 'manual'
     }
   ];
-  liveMonitorGrid.innerHTML = probes.map((probe, index) => {
-    const sweep = performanceBars(probe.pulse + state.monitorTick * 3, index).slice(0, 10);
-    return `
+  // Real fleet CPU series from the ecosystem aggregate; no fabricated sweep.
+  // When history is insufficient (fewer than minPoints aligned collections),
+  // we render no sparkline bars rather than inventing a wave (v12 honesty).
+  const fleetTrend = state.ecosystem?.freshness?.fleetTrend;
+  const realSeries = fleetTrend?.status === 'ready' && Array.isArray(fleetTrend.cpu)
+    ? fleetTrend.cpu.slice(-10)
+    : [];
+  liveMonitorGrid.innerHTML = probes.map((probe) => `
       <article class="live-monitor-card ${escapeHtml(probe.tone)}" data-retro-card>
         <div class="row-title">
           <span>${escapeHtml(probe.label)}</span>
           <strong>${escapeHtml(probe.value)}</strong>
         </div>
         <div class="live-pulse" aria-hidden="true">
-          ${sweep.map((value) => `<span style="height:${value}%"></span>`).join('')}
+          ${realSeries.length
+            ? realSeries.map((value) => `<span style="height:${Math.max(4, Math.min(100, value))}%"></span>`).join('')
+            : '<span class="live-pulse-empty">collecting</span>'}
         </div>
         <div class="pressure-meter"><span style="width:${Math.max(4, Math.min(100, probe.pulse))}%"></span></div>
         <p class="muted">${escapeHtml(probe.detail)}</p>
       </article>
-    `;
-  }).join('');
+    `).join('');
 }
 
 function renderTimeline(report) {
@@ -1708,14 +1549,6 @@ function securitySourceReviewMarkup(review, limit = 6) {
       <p class="evidence-redaction-note">${escapeHtml(review.boundary ?? 'Local evidence only.')}</p>
     </section>
   `;
-}
-
-function performanceBars(value, offset) {
-  return Array.from({ length: 14 }, (_, index) => {
-    const wave = Math.sin((index + offset) * 0.82) * 12;
-    const pulse = index % 4 === 0 ? 7 : 0;
-    return Math.max(12, Math.min(96, value * 0.72 + wave + pulse));
-  });
 }
 
 function renderRuntimeInventory(snapshot) {
@@ -2410,260 +2243,115 @@ function releaseReferenceItems(references) {
   ];
 }
 
-function renderInteractionStudio() {
-  if (!touchQueue || !focusPeekInline) return;
-  const server = activeServer();
-  const report = state.latestReport ?? server?.latestReport;
-  const readiness = state.deliveryReadiness;
-  const cards = [
-    {
-      label: 'Active asset',
-      value: server?.name ?? 'No server',
-      detail: server ? `${server.host}:${server.port ?? 22} | ${server.connection?.status ?? 'untested'}` : 'Add an authorized server first.',
-      status: server?.latestSnapshot ? 'ready' : 'review',
-      action: 'Peek',
-      focus: 'active-server'
-    },
-    {
-      label: 'Latest report',
-      value: report ? `${report.score} score` : 'No report',
-      detail: report ? `${report.findings.length} evidence-backed findings` : 'Run analysis to populate report evidence.',
-      status: report ? scoreClass(report.score) || 'ready' : 'review',
-      action: 'Reports',
-      view: 'reports'
-    },
-    {
-      label: 'Release gate',
-      value: readiness?.status ?? 'review',
-      detail: readiness ? `${readiness.summary.pass} passed, ${readiness.summary.fail} failed` : 'Load delivery readiness.',
-      status: readiness?.status === 'ready' ? 'ready' : 'review',
-      action: 'Release',
-      view: 'release'
-    },
-    {
-      label: 'Action Dock',
-      value: state.actionDockSnap,
-      detail: 'Collect, analyze, readiness, checklist, and focus actions.',
-      status: state.actionDockOpen ? 'ready' : 'review',
-      action: 'Open',
-      command: 'open-dock'
-    }
-  ];
+function renderEcosystem() {
+  // Fleet-wide ecosystem dashboard, driven entirely by /api/ecosystem/overview
+  // (real aggregated telemetry + rule findings). No simulated values: when a
+  // trend lacks enough collections it shows an explicit placeholder, never a
+  // fabricated line. Refreshes on the existing poll loop for live behavior.
+  if (focusPeekInline) {
+    focusPeekInline.innerHTML = focusPeekMarkup();
+  }
+  const overview = state.ecosystem;
+  const fleetSummary = document.querySelector('#ecosystem-fleet-summary');
+  if (fleetSummary) {
+    fleetSummary.textContent = overview
+      ? `${overview.fleet.total} servers | ${overview.fleet.withTelemetry} with telemetry | ${overview.fleet.withReport} analyzed`
+      : 'Loading fleet';
+  }
 
-  touchQueue.innerHTML = cards.map((card) => `
-    <article class="touch-queue-card ${escapeHtml(card.status)}">
-      <div>
-        <span>${escapeHtml(card.label)}</span>
-        <strong>${escapeHtml(card.value)}</strong>
-        <p>${escapeHtml(card.detail)}</p>
-      </div>
-      <button class="secondary-action" ${card.view ? `data-view="${escapeHtml(card.view)}"` : ''} ${card.focus ? `data-focus-peek="${escapeHtml(card.focus)}"` : ''} ${card.command ? `data-action-dock-command="${escapeHtml(card.command)}"` : ''} type="button">${escapeHtml(card.action)}</button>
-    </article>
-  `).join('');
-  focusPeekInline.innerHTML = focusPeekMarkup();
-}
+  const resource = document.querySelector('#eco-resource');
+  const services = document.querySelector('#eco-services');
+  const containers = document.querySelector('#eco-containers');
+  const exposure = document.querySelector('#eco-exposure');
+  const risk = document.querySelector('#eco-risk');
+  const freshness = document.querySelector('#eco-freshness');
+  if (!resource) return;
 
-function renderExperienceDeck() {
-  if (!experienceStage || !experienceProgressDots) return;
-  document.body.dataset.motionIntensity = state.motionIntensity;
-  document.body.dataset.cardDensity = state.cardDensity;
-  const currentIndex = Math.max(0, experienceDeckSteps.findIndex((step) => step.id === state.experienceStep));
-  const current = experienceDeckSteps[currentIndex] ?? experienceDeckSteps[0];
-  const server = activeServer();
-  const report = state.latestReport ?? server?.latestReport;
-  const readiness = state.deliveryReadiness;
-  const metricValue = experienceMetricValue(current.id, server, report, readiness);
-
-  experienceModeSummary.textContent = `${labelCase(state.motionIntensity)} motion, ${state.cardDensity} density`;
-  experiencePresentationToggle.classList.toggle('is-active', state.presentationMode);
-  experiencePresentationToggle.setAttribute('aria-pressed', String(state.presentationMode));
-
-  document.querySelectorAll('[data-experience-step]').forEach((button) => {
-    const selected = button.dataset.experienceStep === current.id;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  });
-  document.querySelectorAll('[data-motion-intensity]').forEach((button) => {
-    const selected = button.dataset.motionIntensity === state.motionIntensity;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  });
-  document.querySelectorAll('[data-card-density]').forEach((button) => {
-    const selected = button.dataset.cardDensity === state.cardDensity;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  });
-
-  experienceStage.innerHTML = `
-    <article class="experience-card ${state.presentationMode ? 'is-presentation' : ''}" data-tactile-card>
-      <div class="experience-card-main">
-        <span>${escapeHtml(current.label)}</span>
-        <strong>${escapeHtml(current.title)}</strong>
-        <p>${escapeHtml(current.detail)}</p>
-      </div>
-      <div class="experience-card-side">
-        <span>${escapeHtml(current.metric)}</span>
-        <strong>${escapeHtml(metricValue)}</strong>
-        <button class="secondary-action" data-view="${escapeHtml(current.view)}" type="button">${escapeHtml(current.action)}</button>
-      </div>
-      <div class="experience-evidence-list">
-        ${current.evidence.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}
-      </div>
-    </article>
-  `;
-  experienceProgressDots.innerHTML = experienceDeckSteps.map((step, index) => `
-    <button class="experience-progress-dot ${index === currentIndex ? 'is-active' : ''}" data-experience-step="${escapeHtml(step.id)}" aria-label="${escapeHtml(step.label)}" type="button"></button>
-  `).join('');
-  bindTactileCards();
-}
-
-function experienceMetricValue(step, server, report, readiness) {
-  if (step === 'prepare') return `${activeServers().length} assets`;
-  if (step === 'inspect') return server?.latestSnapshot ? 'Fresh' : 'No data';
-  if (step === 'analyze') return state.activeAnalysisPreset === 'custom' ? state.activeAnalysisDepth : state.activeAnalysisPreset;
-  if (step === 'report') return report ? `${report.findings.length} findings` : 'No report';
-  return readiness?.status ?? 'Review';
-}
-
-function labelCase(value) {
-  return String(value).slice(0, 1).toUpperCase() + String(value).slice(1);
-}
-
-function setExperienceStep(step) {
-  if (!experienceDeckSteps.some((item) => item.id === step)) return;
-  state.experienceStep = step;
-  renderExperienceDeck();
-}
-
-function moveExperienceStep(direction) {
-  const index = Math.max(0, experienceDeckSteps.findIndex((step) => step.id === state.experienceStep));
-  const nextIndex = Math.max(0, Math.min(experienceDeckSteps.length - 1, index + direction));
-  setExperienceStep(experienceDeckSteps[nextIndex].id);
-}
-
-function setMotionIntensity(intensity) {
-  if (!['calm', 'standard', 'expressive'].includes(intensity)) return;
-  state.motionIntensity = intensity;
-  renderExperienceDeck();
-}
-
-function setCardDensity(density) {
-  if (!['compact', 'comfortable'].includes(density)) return;
-  state.cardDensity = density;
-  renderExperienceDeck();
-}
-
-function togglePresentationMode() {
-  state.presentationMode = !state.presentationMode;
-  renderExperienceDeck();
-}
-
-function renderScenarioBoard() {
-  if (!scenarioCardGrid || !scenarioInspector) return;
-  const active = activeScenario();
-  const pinned = new Set(state.pinnedScenarioIds);
-  scenarioCopyStatus.textContent = state.scenarioCopyStatus;
-  if (scenarioHotkeyStrip) {
-    scenarioHotkeyStrip.dataset.activeScenario = active.id;
-    scenarioHotkeyStrip.querySelectorAll('.scenario-hotkey').forEach((item, index) => {
-      const scenario = scenarioBoardItems[index];
-      item.classList.toggle('is-active', scenario?.id === active.id);
+  if (!overview || overview.fleet.withTelemetry === 0) {
+    const empty = '<p class="muted">Collect telemetry on at least one server to populate the fleet ecosystem.</p>';
+    [resource, services, containers, exposure, risk, freshness].forEach((node) => {
+      if (node) node.innerHTML = empty;
     });
+    return;
   }
-  scenarioCardGrid.innerHTML = scenarioBoardItems.map((scenario) => {
-    const selected = scenario.id === active.id;
-    const isPinned = pinned.has(scenario.id);
-    return `
-      <button class="scenario-card ${escapeHtml(scenario.tone)} ${selected ? 'is-selected' : ''} ${isPinned ? 'is-pinned' : ''}" data-scenario-card="${escapeHtml(scenario.id)}" type="button" aria-pressed="${selected}">
-        <span>${escapeHtml(scenario.hotkey)}</span>
-        <strong>${escapeHtml(scenario.label)}</strong>
-        <small>${escapeHtml(scenario.detail)}</small>
-        <em>${isPinned ? 'Pinned' : 'Select'}</em>
-        <i data-scenario-pin="${escapeHtml(scenario.id)}" aria-label="${isPinned ? 'Unpin scenario' : 'Pin scenario'}">${isPinned ? 'Pinned' : 'Pin'}</i>
-      </button>
-    `;
-  }).join('');
 
-  const server = activeServer();
-  const report = state.latestReport ?? server?.latestReport;
-  const readiness = state.deliveryReadiness;
-  const metric = scenarioMetricValue(active, server, report, readiness);
-  scenarioInspector.innerHTML = `
-    <div class="scenario-inspector-header">
-      <span>${escapeHtml(active.hotkey)} key</span>
-      <strong>${escapeHtml(active.label)}</strong>
-      <p>${escapeHtml(active.detail)}</p>
+  const metricLabels = { cpuPercent: 'CPU', memoryPercent: 'Memory', diskPercent: 'Disk', ioWaitPercent: 'IO wait' };
+  resource.innerHTML = Object.entries(overview.resourcePressure.metrics).map(([key, value]) => `
+    <article class="eco-metric-row ${pressureClass(value.peak)}">
+      <div class="row-title"><span>${escapeHtml(metricLabels[key] ?? key)}</span><strong>${value.average}% avg</strong></div>
+      <div class="pressure-meter"><span style="width:${clampPercent(value.average)}%"></span></div>
+      <p class="muted">Peak ${value.peak}% across fleet</p>
+    </article>
+  `).join('') + (overview.resourcePressure.hottestServer
+    ? `<p class="muted">Hottest: ${escapeHtml(overview.resourcePressure.hottestServer.name)} (${overview.resourcePressure.hottestServer.cpu}% CPU / ${overview.resourcePressure.hottestServer.memory}% mem / ${overview.resourcePressure.hottestServer.disk}% disk)</p>`
+    : '');
+
+  const svc = overview.serviceEcosystem;
+  services.innerHTML = `
+    <div class="row-title"><span>Running / total</span><strong>${svc.running} / ${svc.running + svc.stopped}</strong></div>
+    ${svc.roles.map((role) => `
+      <article class="eco-role-row">
+        <div class="row-title"><span>${escapeHtml(labelForStatus(role.role))}</span><strong>${role.running}/${role.total}</strong></div>
+        <div class="pressure-meter"><span style="width:${clampPercent(role.total ? (role.running / role.total) * 100 : 0)}%"></span></div>
+      </article>
+    `).join('') || '<p class="muted">No services collected.</p>'}`;
+
+  const cf = overview.containerFleet;
+  containers.innerHTML = `
+    <div class="eco-stat-grid">
+      <div class="eco-stat ready"><span>Running</span><strong>${cf.running}</strong></div>
+      <div class="eco-stat ${cf.restarting > 0 ? 'warn' : ''}"><span>Restarting</span><strong>${cf.restarting}</strong></div>
+      <div class="eco-stat ${cf.stopped > 0 ? 'review' : ''}"><span>Stopped</span><strong>${cf.stopped}</strong></div>
     </div>
-    <div class="scenario-metric-row">
-      <div><span>${escapeHtml(active.metric)}</span><strong>${escapeHtml(metric)}</strong></div>
-      <div><span>Pinned</span><strong>${state.pinnedScenarioIds.length}</strong></div>
+    ${cf.restartHotspots.length
+      ? `<p class="muted">Restart hotspots</p>` + cf.restartHotspots.map((spot) => `
+        <article class="eco-hotspot danger"><div class="row-title"><span>${escapeHtml(spot.server)} / ${escapeHtml(spot.name)}</span><strong>${spot.restarts}x</strong></div></article>
+      `).join('')
+      : '<p class="muted">No container restart hotspots.</p>'}`;
+
+  const ex = overview.exposureSurface;
+  exposure.innerHTML = `
+    <div class="eco-stat-grid">
+      <div class="eco-stat ${ex.publicPorts > 0 ? 'warn' : 'ready'}"><span>Public ports</span><strong>${ex.publicPorts}</strong></div>
+      <div class="eco-stat ready"><span>Private ports</span><strong>${ex.privatePorts}</strong></div>
     </div>
-    <div class="scenario-evidence-list">
-      ${active.evidence.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}
+    ${ex.highRiskExposed.length
+      ? `<p class="muted">High-risk exposed</p>` + ex.highRiskExposed.map((item) => `
+        <article class="eco-hotspot danger"><div class="row-title"><span>${escapeHtml(item.server)}</span><strong>:${escapeHtml(String(item.port))}</strong></div></article>
+      `).join('')
+      : '<p class="muted">No high-risk public listeners.</p>'}`;
+
+  const rd = overview.riskDistribution;
+  const severityTone = { critical: 'danger', high: 'warn', medium: 'review', low: 'ready' };
+  risk.innerHTML = `
+    <div class="eco-stat-grid">
+      ${['critical', 'high', 'medium', 'low'].map((sev) => `
+        <div class="eco-stat ${severityTone[sev]}"><span>${escapeHtml(labelForStatus(sev))}</span><strong>${rd.bySeverity[sev] ?? 0}</strong></div>
+      `).join('')}
     </div>
-    <div class="scenario-action-row">
-      <button class="secondary-action" data-view="${escapeHtml(active.view)}" type="button">${escapeHtml(active.action)}</button>
-      <button class="secondary-action" data-action-dock-command="copy-scenario-summary" type="button">Copy Summary</button>
-    </div>
-  `;
-  bindTactileCards();
-}
+    ${rd.byCategory.length
+      ? rd.byCategory.map((cat) => `
+        <article class="eco-role-row">
+          <div class="row-title"><span>${escapeHtml(labelForStatus(cat.category))}</span><strong>${cat.count}</strong></div>
+          <div class="pressure-meter"><span style="width:${clampPercent(rd.total ? (cat.count / rd.total) * 100 : 0)}%"></span></div>
+        </article>
+      `).join('')
+      : '<p class="muted">No findings yet. Run analysis to populate risk distribution.</p>'}`;
 
-function activeScenario() {
-  return scenarioBoardItems.find((item) => item.id === state.activeScenarioId) ?? scenarioBoardItems[0];
-}
-
-function scenarioMetricValue(scenario, server, report, readiness) {
-  if (scenario.id === 'fleet-triage') return `${activeServers().length} assets`;
-  if (scenario.id === 'security-review') {
-    const highRisk = report?.findings?.filter((finding) => ['critical', 'high'].includes(finding.severity)).length ?? 0;
-    return `${highRisk} high`;
-  }
-  if (scenario.id === 'runtime-pressure') return server?.latestSnapshot ? `${server.latestSnapshot.resources.cpuPercent}% CPU` : 'No data';
-  if (scenario.id === 'client-handoff') return report ? `${report.findings.length} findings` : 'No report';
-  return readiness?.status ?? 'Review';
-}
-
-function setActiveScenario(scenarioId) {
-  if (!scenarioBoardItems.some((scenario) => scenario.id === scenarioId)) return;
-  state.activeScenarioId = scenarioId;
-  state.scenarioCopyStatus = 'Ready';
-  renderScenarioBoard();
-}
-
-function toggleScenarioPin(scenarioId) {
-  if (!scenarioBoardItems.some((scenario) => scenario.id === scenarioId)) return;
-  const pinned = new Set(state.pinnedScenarioIds);
-  if (pinned.has(scenarioId)) pinned.delete(scenarioId);
-  else pinned.add(scenarioId);
-  state.pinnedScenarioIds = [...pinned];
-  renderScenarioBoard();
-}
-
-async function copyScenarioSummary() {
-  const scenario = activeScenario();
-  const server = activeServer();
-  const report = state.latestReport ?? server?.latestReport;
-  const summary = [
-    `ServerLens Scenario: ${scenario.label}`,
-    `Scope: ${scenario.detail}`,
-    `Active server: ${server?.name ?? 'No server selected'}`,
-    `Latest score: ${report?.score ?? 'No report'}`,
-    `Evidence: ${scenario.evidence.join(', ')}`,
-    'Boundary: local defensive review only; no hidden discovery or remote modification.'
-  ].join('\n');
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(summary);
-    } else {
-      fallbackCopyText(summary);
-    }
-    state.scenarioCopyStatus = `Copied ${scenario.label}`;
-  } catch {
-    fallbackCopyText(summary);
-    state.scenarioCopyStatus = `Copied ${scenario.label}`;
-  }
-  renderScenarioBoard();
+  const fr = overview.freshness;
+  const trend = fr.fleetTrend;
+  freshness.innerHTML = `
+    ${fr.servers.map((srv) => `
+      <article class="eco-fresh-row ${srv.status === 'fresh' ? 'ready' : srv.status === 'stale' ? 'warn' : 'review'}">
+        <div class="row-title"><span>${escapeHtml(srv.name)}</span><strong>${srv.ageMinutes === null ? 'No data' : `${srv.ageMinutes}m ago`}</strong></div>
+      </article>
+    `).join('')}
+    <div class="eco-trend">
+      <div class="row-title"><span>Fleet CPU trend</span><strong>${labelForStatus(fr.cpuDirection)}</strong></div>
+      ${trend.status === 'ready'
+        ? `<div class="spark-bars" aria-label="Fleet CPU trend">${trend.cpu.map((value) => `<span style="height:${clampPercent(value)}%"></span>`).join('')}</div>`
+        : `<p class="muted">Fleet trend appears after ${trend.minPoints} collections (have ${trend.dataPoints}).</p>`}
+    </div>`;
 }
 
 function fallbackCopyText(text) {
@@ -2956,28 +2644,12 @@ function actionDockCommands() {
       shortcut: 'P'
     },
     {
-      id: 'deck-next',
+      id: 'open-ecosystem',
       tone: 'primary',
-      label: 'Deck',
-      title: 'Next step',
-      detail: experienceDeckSteps.find((step) => step.id === state.experienceStep)?.label ?? 'Prepare',
-      shortcut: 'N'
-    },
-    {
-      id: 'toggle-presentation',
-      tone: 'neutral',
-      label: 'Present',
-      title: state.presentationMode ? 'On' : 'Off',
-      detail: 'Toggle client walkthrough mode',
-      shortcut: 'M'
-    },
-    {
-      id: 'copy-scenario-summary',
-      tone: 'neutral',
-      label: 'Scenario',
-      title: activeScenario().label,
-      detail: 'Copy client-safe scenario summary',
-      shortcut: 'S'
+      label: 'Ecosystem',
+      title: state.ecosystem ? `${state.ecosystem.fleet.withTelemetry} live` : 'Fleet',
+      detail: 'Open the fleet ecosystem overview',
+      shortcut: 'E'
     },
     {
       id: 'copy-inspection-summary',
@@ -3024,7 +2696,7 @@ async function runActionDockCommand(command) {
     state.deliveryReadiness = await api('/api/delivery/readiness');
     renderDeliveryReadiness(state.deliveryReadiness);
     renderReleaseWorkspace();
-    renderInteractionStudio();
+    renderEcosystem();
     setView('settings');
     openActionDock('expanded');
     return;
@@ -3032,7 +2704,7 @@ async function runActionDockCommand(command) {
   if (command === 'open-checklist') {
     state.handoffChecklist = await api('/api/delivery/checklist');
     renderHandoffChecklist(state.handoffChecklist);
-    renderInteractionStudio();
+    renderEcosystem();
     setView('settings');
     openActionDock('expanded');
     return;
@@ -3041,21 +2713,8 @@ async function runActionDockCommand(command) {
     openFocusPeek('active-server');
     return;
   }
-  if (command === 'deck-next') {
-    setView('interaction');
-    moveExperienceStep(1);
-    openActionDock(state.actionDockSnap);
-    return;
-  }
-  if (command === 'toggle-presentation') {
-    setView('interaction');
-    togglePresentationMode();
-    openActionDock('expanded');
-    return;
-  }
-  if (command === 'copy-scenario-summary') {
-    setView('interaction');
-    await copyScenarioSummary();
+  if (command === 'open-ecosystem') {
+    setView('ecosystem');
     openActionDock(state.actionDockSnap);
     return;
   }
@@ -3515,50 +3174,13 @@ function commandItems() {
       }
     })),
     {
-      group: 'Experience',
-      title: 'Open Experience Deck',
-      detail: 'Client walkthrough in Studio',
+      group: 'Ecosystem',
+      title: 'Open Ecosystem Overview',
+      detail: 'Fleet resource pressure, services, containers, exposure, and risk',
       run: async () => {
-        setView('interaction');
-        setExperienceStep('prepare');
+        setView('ecosystem');
       }
     },
-    {
-      group: 'Experience',
-      title: 'Toggle presentation mode',
-      detail: 'Client walkthrough focus state',
-      run: async () => {
-        setView('interaction');
-        togglePresentationMode();
-      }
-    },
-    {
-      group: 'Scenario',
-      title: 'Open Scenario Board',
-      detail: 'Studio scenario cards and inspector',
-      run: async () => {
-        setView('interaction');
-        renderScenarioBoard();
-      }
-    },
-    {
-      group: 'Scenario',
-      title: 'Copy scenario summary',
-      detail: `${activeScenario().label} client-safe summary`,
-      run: async () => {
-        setView('interaction');
-        await copyScenarioSummary();
-      }
-    },
-    ...scenarioBoardItems.map((scenario) => ({
-      group: 'Scenario',
-      title: `Select ${scenario.label}`,
-      detail: `Hotkey ${scenario.hotkey} | ${scenario.detail}`,
-      run: async () => {
-        setView('interaction');
-        setActiveScenario(scenario.id);
-      }
-    })),
     {
       group: 'Delivery',
       title: 'Run readiness gate',

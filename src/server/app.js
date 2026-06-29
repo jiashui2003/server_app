@@ -9,6 +9,7 @@ import { timingSafeEqual } from 'node:crypto';
 
 import { analyzeSnapshot, resolveAnalysisOptions } from '../shared/analysis-engine.js';
 import { buildDeliveryEvidence, buildDeliveryReadiness, buildPageExperienceReadiness, buildUiExperienceAudit } from '../shared/delivery-evidence.js';
+import { buildEcosystemOverview } from '../shared/ecosystem-overview.js';
 import { buildSshArgs, collectSnapshotForServer, collectSnapshotForServerAsync } from './collector.js';
 import { createStore } from './store.js';
 import { dispatchWebhook } from './webhook-notifier.js';
@@ -235,6 +236,10 @@ export function createApp(options = {}) {
 
       if (method === 'GET' && urlPath === '/api/delivery/readiness') {
         return json(200, buildDeliveryReadiness({ projectRoot }));
+      }
+
+      if (method === 'GET' && urlPath === '/api/ecosystem/overview') {
+        return json(200, buildEcosystemForStore(store));
       }
 
       return json(404, { message: 'Route not found.' });
@@ -1232,6 +1237,15 @@ function buildStatusPageSummary(store) {
     services,
     incidents
   };
+}
+
+function buildEcosystemForStore(store) {
+  const servers = store.listServers();
+  const histories = {};
+  for (const server of servers) {
+    histories[server.id] = store.listSnapshotHistory(server.id);
+  }
+  return buildEcosystemOverview({ servers, histories });
 }
 
 function buildHandoffChecklist(store) {

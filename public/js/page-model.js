@@ -12,7 +12,7 @@ export const viewTitles = {
   reports: 'Reports',
   alerts: 'Alerts',
   release: 'Delivery Workspace',
-  interaction: 'Interaction Studio',
+  ecosystem: 'Ecosystem',
   settings: 'Settings'
 };
 
@@ -87,12 +87,12 @@ export const pageExperienceModel = {
     evidence: ['Readiness', 'Review queue', 'Safety'],
     nextStep: 'Run delivery validation before packaging handoff.'
   },
-  interaction: {
-    action: 'Next Step',
-    command: 'deck-next',
-    title: 'Tune walkthrough interaction',
-    evidence: ['Deck', 'Scenario', 'Dock'],
-    nextStep: 'Select a scenario and use Action Dock for the next review step.'
+  ecosystem: {
+    action: 'Open Servers',
+    view: 'servers',
+    title: 'Review fleet ecosystem',
+    evidence: ['Resource', 'Services', 'Risk'],
+    nextStep: 'Collect telemetry on more servers to enrich the fleet trend.'
   },
   settings: {
     action: 'Readiness',

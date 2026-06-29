@@ -423,3 +423,31 @@ test('API rejects unsafe server asset metadata before collection', async () => {
   assert.equal(response.statusCode, 400);
   assert.match(JSON.parse(response.body).message, /port/i);
 });
+
+test('API exposes a fleet ecosystem overview aggregated from collected telemetry', async () => {
+  const app = createApp({ memoryOnly: true });
+  const before = JSON.parse((await app.inject('GET', '/api/ecosystem/overview')).body);
+  const created = JSON.parse((await app.inject('POST', '/api/servers', {
+    name: 'Production Edge',
+    host: 'demo.local',
+    mode: 'demo'
+  })).body);
+  await app.inject('POST', `/api/servers/${created.id}/collect`, {});
+
+  const response = await app.inject('GET', '/api/ecosystem/overview');
+  assert.equal(response.statusCode, 200);
+  const overview = JSON.parse(response.body);
+
+  assert.equal(overview.mode, 'local-fleet-ecosystem');
+  assert.equal(overview.fleet.total, before.fleet.total + 1);
+  assert.ok(overview.fleet.withTelemetry >= 1);
+  assert.ok(overview.resourcePressure.metrics.cpuPercent);
+  assert.ok(Array.isArray(overview.serviceEcosystem.roles));
+  assert.ok(overview.containerFleet.total >= 0);
+  assert.ok(typeof overview.exposureSurface.publicPorts === 'number');
+  assert.ok(overview.freshness.fleetTrend.status);
+
+  // The overview must not leak secrets.
+  const serialized = JSON.stringify(overview);
+  assert.doesNotMatch(serialized, /password|keyPath|authorized_keys/i);
+});

@@ -32,6 +32,7 @@ The operator workflow is: **add a server → test the connection → collect tel
 - **Servers** — add/edit/archive assets with host, port, auth type, collection mode (demo / local / authorized SSH), and tags. A Connection Health Map shows TCP + SSH authentication stages and concrete next actions.
 - **Collection** — demo, local, or agentless SSH (`BatchMode`) collection of CPU, memory, disk, IO, ports, services, containers, firewall posture, and security events. Passwords are never stored.
 - **Analysis** — selectable modules (health, security, runtime, ecosystem, logs, network, performance) with presets, depth, and time-range controls. Produces evidence-backed findings, a remediation checklist, service topology, and a service catalog.
+- **Ecosystem** — a real-time, fleet-wide dashboard that aggregates resource pressure, service mix, container fleet, exposure surface, risk distribution, and freshness across all servers from collected telemetry. It auto-refreshes on the live polling loop and shows an explicit placeholder (never a fabricated line) until enough history exists.
 - **Delivery Workspace** — one tabbed surface for handoff review: **Inspect** (authorized inspection flow), **Validate** (release readiness gate), and **Handoff** (strategy iteration evidence).
 - **Reports** — history, score/finding trends, current-vs-previous comparison, a redacted status-page preview, and Markdown / print-ready PDF export.
 
@@ -102,6 +103,7 @@ Code signing runs automatically when `SERVERLENS_SIGN_CERT` is configured; other
 | 13.0 | Frontend modularity — pure logic extracted into unit-tested ES modules |
 | 14.0 | Information architecture — three delivery views consolidated into one tabbed Delivery Workspace |
 | 15.0 | Accessibility (ARIA tabs, skip link, live regions, reduced-motion) + optional webhook notifications and signed-installer config (both off by default) |
+| 16.0 | Real-time fleet Ecosystem dashboard (resource/service/container/exposure/risk/freshness aggregation) replacing decorative studio panels; removed the last fabricated visualization |
 
 ## License
 

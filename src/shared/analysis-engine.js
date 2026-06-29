@@ -1261,7 +1261,7 @@ function buildServiceCatalog(snapshot, findings) {
   return [...entries.values()].sort(compareCatalogEntries);
 }
 
-function inferServiceRole(value, port) {
+export function inferServiceRole(value, port) {
   const name = normalizeName(value);
   if ([3306, 5432, 27017, 9200].includes(port) || /mysql|mysqld|mariadb|postgres|postgresql|mongo|elastic/.test(name)) {
     return 'database';

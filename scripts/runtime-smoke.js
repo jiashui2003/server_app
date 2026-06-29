@@ -50,11 +50,11 @@ async function fallbackRuntimeSmoke(url, electronError) {
   assertIncludes(html, 'id="delivery-readiness-button"', 'readiness button');
   assertIncludes(html, 'id="command-palette-button"', 'command palette button');
   assertIncludes(html, 'id="release-readiness-workspace"', 'release readiness workspace');
-  assertIncludes(html, 'id="interaction-studio"', 'interaction studio');
-  assertIncludes(html, 'id="experience-deck"', 'experience deck');
-  assertIncludes(html, 'id="experience-stepper"', 'experience stepper');
-  assertIncludes(html, 'id="scenario-board"', 'scenario board');
-  assertIncludes(html, 'id="scenario-inspector"', 'scenario inspector');
+  assertIncludes(html, 'id="ecosystem-view"', 'ecosystem view');
+  assertIncludes(html, 'id="ecosystem-studio"', 'ecosystem quick navigation');
+  assertIncludes(html, 'id="eco-resource"', 'ecosystem resource panel');
+  assertIncludes(html, 'id="eco-services"', 'ecosystem services panel');
+  assertIncludes(html, 'id="eco-risk"', 'ecosystem risk panel');
   assertIncludes(html, 'id="inspection-workspace"', 'inspection workspace');
   assertIncludes(html, 'id="inspection-step-rail"', 'inspection step rail');
   assertIncludes(html, 'id="strategy-workspace"', 'strategy workspace');
@@ -89,10 +89,10 @@ async function fallbackRuntimeSmoke(url, electronError) {
   assertIncludes(css, '.readiness-summary', 'readiness summary layout');
   assertIncludes(css, '.release-readiness-card', 'release readiness cards');
   assertIncludes(css, '.tactile-card', 'tactile cards');
-  assertIncludes(css, '.experience-card', 'experience cards');
-  assertIncludes(css, '.experience-progress-dot', 'experience progress dots');
-  assertIncludes(css, '.scenario-card', 'scenario cards');
-  assertIncludes(css, '.scenario-inspector', 'scenario inspector');
+  assertIncludes(css, '.ecosystem-grid', 'ecosystem grid layout');
+  assertIncludes(css, '.ecosystem-panel', 'ecosystem panels');
+  assertIncludes(css, '.eco-metric-row', 'ecosystem metric rows');
+  assertIncludes(css, '.eco-trend', 'ecosystem fleet trend');
   assertIncludes(css, '.inspection-step-card', 'inspection step cards');
   assertIncludes(css, '.inspection-evidence-panel', 'inspection evidence panel');
   assertIncludes(css, '.strategy-iteration-card', 'strategy iteration cards');
@@ -112,9 +112,7 @@ async function fallbackRuntimeSmoke(url, electronError) {
   assertIncludes(js, 'renderLiveMonitor', 'live monitor renderer');
   assertIncludes(js, 'setInterval', 'local polling interval');
   assertIncludes(js, 'renderReleaseWorkspace', 'release renderer');
-  assertIncludes(js, 'renderInteractionStudio', 'interaction renderer');
-  assertIncludes(js, 'renderExperienceDeck', 'experience deck renderer');
-  assertIncludes(js, 'renderScenarioBoard', 'scenario board renderer');
+  assertIncludes(js, 'renderEcosystem', 'ecosystem renderer');
   assertIncludes(js, 'renderInspectionWorkspace', 'inspection workspace renderer');
   assertIncludes(js, 'renderStrategyWorkspace', 'strategy workspace renderer');
   assertIncludes(js, 'renderActionDock', 'action dock renderer');
@@ -331,28 +329,17 @@ async function smokePage() {
   assert(['auto', 'scroll'].includes(releaseQueueStyle.overflowY), 'Release review queue is not scrollable.');
   assert(releaseQueueStyle.overscrollBehavior === 'contain', 'Release review queue does not contain overscrollBehavior.');
 
-  await click('[data-view="interaction"]');
+  await click('[data-view="ecosystem"]');
   await waitFor('#interaction-swipe-rail .tactile-card');
-  assert(document.querySelectorAll('#interaction-swipe-rail .tactile-card').length === 6, 'Expected six tactile cards.');
-  await waitFor('#experience-deck .experience-card');
-  assert(document.querySelectorAll('[data-experience-step]').length >= 5, 'Expected five Experience Deck steps.');
-  await click('[data-experience-step="release"]');
-  assert(document.querySelector('[data-experience-step="release"]').classList.contains('is-selected'), 'Release experience step did not become selected.');
-  await click('[data-motion-intensity="calm"]');
-  assert(document.body.dataset.motionIntensity === 'calm', 'Motion intensity did not update.');
-  await click('[data-card-density="compact"]');
-  assert(document.body.dataset.cardDensity === 'compact', 'Card density did not update.');
-  await click('#experience-presentation-toggle');
-  assert(document.querySelector('#experience-deck .experience-card').classList.contains('is-presentation'), 'Presentation mode did not activate.');
-  await waitFor('#scenario-card-grid .scenario-card');
-  assert(document.querySelectorAll('#scenario-card-grid .scenario-card').length === 5, 'Expected five Scenario Board cards.');
-  await click('[data-scenario-card="security-review"]');
-  assert(document.querySelector('[data-scenario-card="security-review"]').classList.contains('is-selected'), 'Security scenario did not become selected.');
-  await click('[data-scenario-pin="security-review"]');
-  assert(document.querySelector('[data-scenario-card="security-review"]').classList.contains('is-pinned'), 'Security scenario did not pin.');
+  assert(document.querySelectorAll('#interaction-swipe-rail .tactile-card').length === 6, 'Expected six tactile navigation cards.');
+  await waitFor('#eco-resource .eco-metric-row');
+  assert(document.querySelectorAll('#eco-resource .eco-metric-row').length >= 1, 'Ecosystem resource panel did not populate from real telemetry.');
+  assert(document.querySelector('#eco-services').textContent.trim().length > 0, 'Ecosystem services panel is empty.');
+  assert(document.querySelector('#eco-risk').textContent.trim().length > 0, 'Ecosystem risk panel is empty.');
+  assert(document.querySelector('#eco-freshness').textContent.trim().length > 0, 'Ecosystem freshness panel is empty.');
   const railStyle = styleOf('#interaction-swipe-rail');
-  assert(railStyle.scrollSnapType.includes('x'), 'Interaction rail is missing x snap.');
-  assert(document.querySelector('#interaction-swipe-rail').classList.contains('ios-snap-rail'), 'Interaction rail is missing iOS snap binding.');
+  assert(railStyle.scrollSnapType.includes('x'), 'Ecosystem nav rail is missing x snap.');
+  assert(document.querySelector('#interaction-swipe-rail').classList.contains('ios-snap-rail'), 'Ecosystem nav rail is missing iOS snap binding.');
   assert(document.querySelector('#interaction-swipe-rail .tactile-card').classList.contains('ios-interactive'), 'Tactile card is missing iOS press binding.');
 
   await click('[data-view="delivery"]');
@@ -392,10 +379,7 @@ async function smokePage() {
     readinessChecks,
     commandHasReadiness: commandText.includes('Run readiness gate'),
     releaseCards: document.querySelectorAll('#release-readiness-cards .release-readiness-card').length,
-    experienceSteps: document.querySelectorAll('#experience-stepper [data-experience-step]').length,
-    presentationMode: document.querySelector('#experience-deck .experience-card').classList.contains('is-presentation'),
-    scenarioCards: document.querySelectorAll('#scenario-card-grid .scenario-card').length,
-    scenarioSelected: document.querySelector('[data-scenario-card="security-review"]').classList.contains('is-selected'),
+    ecosystemPanels: document.querySelectorAll('#eco-resource, #eco-services, #eco-containers, #eco-exposure, #eco-risk, #eco-freshness').length,
     inspectionCards: document.querySelectorAll('#inspection-step-rail .inspection-step-card').length,
     inspectionSelected: document.querySelector('[data-inspection-step="package"]').classList.contains('is-selected'),
     strategyCards: document.querySelectorAll('#strategy-iteration-rail .strategy-iteration-card').length,

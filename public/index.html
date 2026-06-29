@@ -14,7 +14,7 @@
           <span class="brand-mark" aria-hidden="true"></span>
           <div>
             <strong>ServerLens</strong>
-            <span>15.0</span>
+            <span>16.0</span>
           </div>
         </div>
 
@@ -26,7 +26,7 @@
           <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="reports" type="button">Reports</button>
           <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="alerts" type="button">Alerts</button>
           <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="delivery" type="button">Delivery</button>
-          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="interaction" type="button">Studio</button>
+          <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="ecosystem" type="button">Ecosystem</button>
           <button class="nav-item ios-segment" data-slot="sidebar-menu-button" data-view="settings" type="button">Settings</button>
         </nav>
       </aside>
@@ -34,7 +34,7 @@
       <main class="workspace" data-slot="sidebar-inset" id="main-content" tabindex="-1">
         <header class="topbar" data-slot="card-header">
           <div>
-            <p class="eyebrow"><span class="ios-badge" data-slot="badge" data-variant="outline">15.0</span></p>
+            <p class="eyebrow"><span class="ios-badge" data-slot="badge" data-variant="outline">16.0</span></p>
             <h1 id="view-title">Overview</h1>
           </div>
           <div class="topbar-actions" data-slot="button-group">
@@ -617,14 +617,14 @@
           </div>
         </section>
 
-        <section class="view interaction-studio" id="interaction-view">
-          <section class="panel interaction-hero" id="interaction-studio" aria-label="Interaction Studio">
+        <section class="view ecosystem-view" id="ecosystem-view">
+          <section class="panel ecosystem-hero" id="ecosystem-studio" aria-label="Ecosystem quick navigation">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">ServerLens 10.0</p>
-                <h2>Interaction Studio</h2>
+                <p class="eyebrow">Fleet ecosystem</p>
+                <h2>Ecosystem Overview</h2>
               </div>
-              <span>Touch</span>
+              <span id="ecosystem-fleet-summary" aria-live="polite">Loading fleet</span>
             </div>
             <div class="interaction-swipe-rail" id="interaction-swipe-rail" aria-label="Tactile action cards">
               <button class="tactile-card" data-tactile-card data-view="servers" type="button">
@@ -660,84 +660,64 @@
             </div>
           </section>
 
-          <section class="panel experience-deck-panel lower-grid" id="experience-deck" aria-label="Experience Deck">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">Client walkthrough</p>
-                <h2>Experience Deck</h2>
-              </div>
-              <span id="experience-mode-summary">Standard motion, comfortable density</span>
-            </div>
-            <div class="experience-toolbar">
-              <div class="experience-control-group" id="experience-motion-control" aria-label="Motion intensity">
-                <span>Motion</span>
-                <button class="segmented" data-motion-intensity="calm" type="button">Calm</button>
-                <button class="segmented" data-motion-intensity="standard" type="button">Standard</button>
-                <button class="segmented" data-motion-intensity="expressive" type="button">Expressive</button>
-              </div>
-              <div class="experience-control-group" id="experience-density-control" aria-label="Card density">
-                <span>Density</span>
-                <button class="segmented" data-card-density="compact" type="button">Compact</button>
-                <button class="segmented" data-card-density="comfortable" type="button">Comfortable</button>
-              </div>
-              <button class="secondary-action" id="experience-presentation-toggle" aria-pressed="false" type="button">Presentation</button>
-            </div>
-            <div class="experience-stepper" id="experience-stepper" aria-label="Experience walkthrough steps">
-              <button class="experience-step-button" data-experience-step="prepare" type="button">Prepare</button>
-              <button class="experience-step-button" data-experience-step="inspect" type="button">Inspect</button>
-              <button class="experience-step-button" data-experience-step="analyze" type="button">Analyze</button>
-              <button class="experience-step-button" data-experience-step="report" type="button">Report</button>
-              <button class="experience-step-button" data-experience-step="release" type="button">Release</button>
-            </div>
-            <div class="experience-stage" id="experience-stage"></div>
-            <div class="experience-progress-dots" id="experience-progress-dots" aria-label="Experience progress"></div>
-          </section>
-
-          <section class="panel scenario-board-panel lower-grid" id="scenario-board" aria-label="Scenario Board">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">Operator scenarios</p>
-                <h2>Scenario Board</h2>
-              </div>
-              <span class="scenario-copy-status" id="scenario-copy-status">Ready</span>
-            </div>
-            <div class="scenario-hotkey-strip" id="scenario-hotkey-strip" aria-label="Scenario shortcuts">
-              <span class="scenario-hotkey">1 Fleet</span>
-              <span class="scenario-hotkey">2 Security</span>
-              <span class="scenario-hotkey">3 Runtime</span>
-              <span class="scenario-hotkey">4 Handoff</span>
-              <span class="scenario-hotkey">5 Release</span>
-            </div>
-            <div class="scenario-board-layout">
-              <div class="scenario-card-grid" id="scenario-card-grid"></div>
-              <aside class="scenario-inspector" id="scenario-inspector" aria-label="Scenario inspector">
-                <p class="muted">Select a scenario to review safe next actions.</p>
-              </aside>
-            </div>
-            <button class="secondary-action" id="scenario-copy-button" type="button">Copy Scenario Summary</button>
-            <button class="scenario-card" data-scenario-card="fleet-triage" type="button" hidden></button>
-            <button class="scenario-card" data-scenario-card="security-review" type="button" hidden></button>
-            <button class="scenario-card" data-scenario-card="runtime-pressure" type="button" hidden></button>
-            <button class="scenario-card" data-scenario-card="client-handoff" type="button" hidden></button>
-            <button class="scenario-card" data-scenario-card="release-audit" type="button" hidden></button>
-          </section>
-
-          <div class="interaction-grid lower-grid">
-            <section class="panel">
+          <div class="ecosystem-grid lower-grid">
+            <section class="panel ecosystem-panel" aria-label="Resource pressure">
               <div class="section-heading">
-                <h2>Touch Queue</h2>
-                <span>Swipe, press, route</span>
+                <h2>Resource Pressure</h2>
+                <span>Fleet average and peak</span>
               </div>
-              <div class="touch-queue" id="touch-queue"></div>
+              <div class="ecosystem-resource" id="eco-resource"></div>
             </section>
-            <section class="panel">
+            <section class="panel ecosystem-panel" aria-label="Service ecosystem">
               <div class="section-heading">
-                <h2>Focus Peek</h2>
-                <span>Current context</span>
+                <h2>Service Ecosystem</h2>
+                <span>Roles across the fleet</span>
               </div>
-              <div class="focus-peek-inline" id="focus-peek-inline"></div>
+              <div class="ecosystem-services" id="eco-services"></div>
             </section>
           </div>
+
+          <div class="ecosystem-grid lower-grid">
+            <section class="panel ecosystem-panel" aria-label="Container fleet">
+              <div class="section-heading">
+                <h2>Container Fleet</h2>
+                <span>Running, restarting, hotspots</span>
+              </div>
+              <div class="ecosystem-containers" id="eco-containers"></div>
+            </section>
+            <section class="panel ecosystem-panel" aria-label="Exposure surface">
+              <div class="section-heading">
+                <h2>Exposure Surface</h2>
+                <span>Public ports and high-risk listeners</span>
+              </div>
+              <div class="ecosystem-exposure" id="eco-exposure"></div>
+            </section>
+          </div>
+
+          <div class="ecosystem-grid lower-grid">
+            <section class="panel ecosystem-panel" aria-label="Risk distribution">
+              <div class="section-heading">
+                <h2>Risk Distribution</h2>
+                <span>Findings by severity and category</span>
+              </div>
+              <div class="ecosystem-risk" id="eco-risk"></div>
+            </section>
+            <section class="panel ecosystem-panel" aria-label="Fleet freshness and trend">
+              <div class="section-heading">
+                <h2>Freshness &amp; Fleet Trend</h2>
+                <span>Collection age and real CPU/memory series</span>
+              </div>
+              <div class="ecosystem-freshness" id="eco-freshness"></div>
+            </section>
+          </div>
+
+          <section class="panel" aria-label="Focus peek context">
+            <div class="section-heading">
+              <h2>Focus Peek</h2>
+              <span>Current context</span>
+            </div>
+            <div class="focus-peek-inline" id="focus-peek-inline"></div>
+          </section>
         </section>
 
         <section class="view" id="settings-view">

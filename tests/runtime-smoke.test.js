@@ -26,10 +26,10 @@ test('runtime smoke script verifies rendered UI, scrolling, command center, and 
   assert.match(script, /release-readiness-card/);
   assert.match(script, /renderReleaseWorkspace/);
   assert.match(script, /data-release-mode-card="client-handoff"/);
-  assert.match(script, /interaction-studio/);
+  assert.match(script, /ecosystem-studio/);
   assert.match(script, /action-dock/);
   assert.match(script, /focus-peek/);
-  assert.match(script, /renderInteractionStudio/);
+  assert.match(script, /renderEcosystem/);
   assert.match(script, /renderActionDock/);
   assert.match(script, /tactile-card/);
   assert.match(script, /scroll-snap-type: x mandatory/);
@@ -69,7 +69,8 @@ test('UI visual evidence script captures browser screenshots when available', as
   assert.match(script, /horizontalOverflow/);
   assert.match(script, /releaseWorkspacePresent/);
   assert.match(script, /releaseCardsPresent/);
-  assert.match(script, /interactionStudioPresent/);
+  assert.match(script, /ecosystemViewPresent/);
+  assert.match(script, /ecosystemPanelsPresent/);
   assert.match(script, /actionDockPresent/);
   assert.match(script, /tactileCardsPresent/);
   assert.match(script, /release-readiness-workspace/);

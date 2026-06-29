@@ -214,7 +214,7 @@ test('API exposes a local UI experience audit for commercial design review', asy
 test('API exposes ServerLens 10 page-by-page experience readiness', async () => {
   const readiness = buildPageExperienceReadiness();
   assert.equal(readiness.mode, 'local-page-experience-readiness');
-  assert.equal(readiness.versionTarget, '15.0.0');
+  assert.equal(readiness.versionTarget, '16.0.0');
   assert.equal(readiness.status, 'ready');
   assert.equal(readiness.pages.length, 11);
   assert.deepEqual(readiness.pages.map((page) => page.id), [
@@ -227,7 +227,7 @@ test('API exposes ServerLens 10 page-by-page experience readiness', async () => 
     'reports',
     'alerts',
     'release',
-    'interaction',
+    'ecosystem',
     'settings'
   ]);
   assert.ok(readiness.pages.every((page) => page.primaryAction && page.evidence.length >= 3 && page.nextStep));
@@ -343,9 +343,8 @@ test('API exposes a delivery evidence manifest for commercial handoff', async ()
   assert.ok(evidence.capabilities.includes('report remediation checklist with acceptance criteria'));
   assert.ok(evidence.capabilities.includes('server runbook Markdown export for handoff operations'));
   assert.ok(evidence.capabilities.includes('release readiness workspace for client handoff review'));
-  assert.ok(evidence.capabilities.includes('iOS-inspired Interaction Studio with tactile cards, swipe rail, Action Dock, and Focus Peek'));
-  assert.ok(evidence.capabilities.includes('guided Experience Deck for client walkthrough, presentation mode, motion intensity, and density controls'));
-  assert.ok(evidence.capabilities.includes('Scenario Board with selectable cards, pinned scenarios, copyable summaries, and keyboard shortcuts'));
+  assert.ok(evidence.capabilities.includes('real-time fleet ecosystem overview aggregating resource pressure, services, containers, exposure, risk, and freshness from collected telemetry'));
+  assert.ok(evidence.capabilities.includes('iOS-inspired action layer with tactile navigation cards, Action Dock, and Focus Peek'));
   assert.ok(evidence.capabilities.includes('Authorized Inspection Workspace with guided preflight, collection, analysis, and package evidence'));
   assert.ok(evidence.capabilities.includes('10-cycle Strategy Iteration Workspace with plan, execution, validation, and handoff evidence'));
   assert.ok(evidence.capabilities.includes('ServerLens 10.0 page-by-page operation summary with primary action, evidence state, and next step for every view'));
@@ -393,9 +392,8 @@ test('API exposes a delivery readiness gate with categorized commercial checks',
   assert.ok(readiness.checks.some((check) => check.id === 'capabilities.security-source-review' && check.status === 'pass'));
   assert.ok(readiness.checks.some((check) => check.id === 'capabilities.commercial-interaction-polish' && check.status === 'pass'));
   assert.ok(readiness.checks.some((check) => check.id === 'capabilities.release-readiness-workspace' && check.status === 'pass'));
-  assert.ok(readiness.checks.some((check) => check.id === 'capabilities.interaction-studio' && check.status === 'pass'));
-  assert.ok(readiness.checks.some((check) => check.id === 'capabilities.experience-deck' && check.status === 'pass'));
-  assert.ok(readiness.checks.some((check) => check.id === 'capabilities.scenario-board' && check.status === 'pass'));
+  assert.ok(readiness.checks.some((check) => check.id === 'capabilities.ecosystem-overview' && check.status === 'pass'));
+  assert.ok(readiness.checks.some((check) => check.id === 'capabilities.action-layer' && check.status === 'pass'));
   assert.ok(readiness.checks.some((check) => check.id === 'capabilities.authorized-inspection-workspace' && check.status === 'pass'));
   assert.ok(readiness.checks.some((check) => check.id === 'capabilities.10-cycle-strategy-workspace' && check.status === 'pass'));
   assert.ok(readiness.checks.some((check) => check.id === 'capabilities.v9-retroui-clarity-system' && check.status === 'pass'));

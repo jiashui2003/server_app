@@ -12,7 +12,7 @@ test('package.json declares desktop app packaging scripts and metadata', async (
   assert.equal(pkg.scripts['delivery:validate'], 'node scripts/delivery-validate.js');
   assert.equal(pkg.scripts['ui:evidence'], 'node scripts/ui-visual-evidence.js');
   assert.equal(pkg.scripts['pack:dir'], 'electron-builder --dir');
-  assert.equal(pkg.version, '15.0.0');
+  assert.equal(pkg.version, '16.0.0');
   assert.equal(pkg.build.appId, 'com.vibeserverstatus.serverlens');
   assert.equal(pkg.build.productName, 'ServerLens');
   assert.deepEqual(pkg.build.files, [

@@ -63,7 +63,7 @@ for (const token of [
   'data-view="reports"',
   'data-view="alerts"',
   'data-view="server-detail"',
-  'data-view="interaction"',
+  'data-view="ecosystem"',
   'data-view="settings"',
   'analysis-run-builder',
   'Analysis run builder',
@@ -108,27 +108,17 @@ for (const token of [
   'release-review-queue',
   'release-reference-basis',
   'release-safety-ledger',
-  'interaction-studio',
-  'Interaction Studio',
+  'ecosystem-studio',
+  'Ecosystem Overview',
   'interaction-swipe-rail',
-  'experience-deck',
-  'Experience Deck',
-  'experience-stepper',
-  'data-experience-step="prepare"',
-  'data-motion-intensity="calm"',
-  'data-card-density="compact"',
-  'experience-presentation-toggle',
-  'experience-progress-dots',
-  'scenario-board',
-  'Scenario Board',
-  'scenario-card-grid',
-  'data-scenario-card="fleet-triage"',
-  'data-scenario-card="security-review"',
-  'data-scenario-card="runtime-pressure"',
-  'scenario-inspector',
-  'scenario-copy-button',
-  'scenario-copy-status',
-  'scenario-hotkey-strip',
+  'ecosystem-grid',
+  'eco-resource',
+  'eco-services',
+  'eco-containers',
+  'eco-exposure',
+  'eco-risk',
+  'eco-freshness',
+  'ecosystem-fleet-summary',
   'data-tactile-card',
   'action-dock',
   'Action Dock',
@@ -234,21 +224,9 @@ for (const token of [
   'releaseReferenceBasis',
   'releaseSafetyLedger',
   'data-release-mode-card',
-  'renderInteractionStudio',
-  'renderExperienceDeck',
-  'experienceDeckSteps',
-  'setExperienceStep',
-  'setMotionIntensity',
-  'setCardDensity',
-  'togglePresentationMode',
-  'data-experience-step',
-  'data-motion-intensity',
-  'data-card-density',
-  'renderScenarioBoard',
-  'scenarioBoardItems',
-  'setActiveScenario',
-  'toggleScenarioPin',
-  'copyScenarioSummary',
+  'renderEcosystem',
+  'state.ecosystem',
+  '/api/ecosystem/overview',
   'renderInspectionWorkspace',
   'inspectionStepItems',
   'setInspectionStep',
@@ -259,9 +237,6 @@ for (const token of [
   'setStrategyIteration',
   'copyStrategySummary',
   '/api/delivery/strategy',
-  'data-scenario-card',
-  'data-scenario-pin',
-  'scenario-hotkey',
   'renderActionDock',
   'renderFocusPeek',
   'bindTactileCards',
@@ -331,7 +306,6 @@ for (const token of [
   'keyPath',
   'server.mode',
   'renderPerformancePanel',
-  'performanceBars',
   "healthCell('Server'",
   "healthCell('Disk'",
   'health-cell-label',
@@ -459,25 +433,16 @@ for (const token of [
   '.release-reference-grid',
   '.release-safety-ledger',
   '.release-action-row',
-  '.interaction-studio',
-  '.experience-deck-panel',
-  '.experience-toolbar',
-  '.experience-stepper',
-  '.experience-step-button',
-  '.experience-stage',
-  '.experience-card',
-  '.experience-progress-dots',
-  '.experience-progress-dot',
-  'body[data-motion-intensity="calm"]',
-  'body[data-card-density="compact"]',
-  '.scenario-board-panel',
-  '.scenario-card-grid',
-  '.scenario-card',
-  '.scenario-card.is-selected',
-  '.scenario-card.is-pinned',
-  '.scenario-inspector',
-  '.scenario-hotkey-strip',
-  '.scenario-copy-status',
+  '.ecosystem-hero',
+  '.ecosystem-grid',
+  '.ecosystem-panel',
+  '.eco-metric-row',
+  '.eco-role-row',
+  '.eco-stat-grid',
+  '.eco-stat',
+  '.eco-hotspot',
+  '.eco-fresh-row',
+  '.eco-trend',
   '.interaction-swipe-rail',
   'scroll-snap-type: x mandatory',
   '--ios-material',
@@ -651,7 +616,7 @@ for (const token of ['buildDeliveryEvidence', 'buildDeliveryReadiness', 'buildPa
   }
 }
 
-for (const token of ['buildDeliveryEvidence', 'buildDeliveryReadiness', 'buildDeliveryValidationLedger', 'buildPageExperienceReadiness', 'uiExperienceAudit', 'pageExperienceReadiness', 'local-ui-experience-audit', 'local-page-experience-readiness', 'local-delivery-validation-ledger', 'security source review for collected authentication and connection evidence', 'commercial interaction polish with card run builder, evidence tracker, and server inspector', 'release readiness workspace for client handoff review', 'iOS-inspired Interaction Studio with tactile cards, swipe rail, Action Dock, and Focus Peek', 'guided Experience Deck for client walkthrough, presentation mode, motion intensity, and density controls', 'Scenario Board with selectable cards, pinned scenarios, copyable summaries, and keyboard shortcuts', 'Authorized Inspection Workspace with guided preflight, collection, analysis, and package evidence', '10-cycle Strategy Iteration Workspace with plan, execution, validation, and handoff evidence', 'ServerLens 10.0 page-by-page operation summary with primary action, evidence state, and next step for every view', 'capabilities.security-source-review', 'capabilities.release-readiness-workspace', 'capabilities.interaction-studio', 'capabilities.experience-deck', 'capabilities.scenario-board', 'capabilities.authorized-inspection-workspace', 'capabilities.10-cycle-strategy-workspace', 'capabilities.v10-page-operation-summary', 'references.current-v100-monitoring', 'verificationCommands', 'githubReferences', 'uptime-kuma', 'glances', 'node_exporter', 'dashy', 'retroui-card', 'safetyBoundary', 'win-unpacked', 'ServerLens.exe', 'readiness']) {
+for (const token of ['buildDeliveryEvidence', 'buildDeliveryReadiness', 'buildDeliveryValidationLedger', 'buildPageExperienceReadiness', 'uiExperienceAudit', 'pageExperienceReadiness', 'local-ui-experience-audit', 'local-page-experience-readiness', 'local-delivery-validation-ledger', 'security source review for collected authentication and connection evidence', 'commercial interaction polish with card run builder, evidence tracker, and server inspector', 'release readiness workspace for client handoff review', 'iOS-inspired action layer with tactile navigation cards, Action Dock, and Focus Peek', 'Authorized Inspection Workspace with guided preflight, collection, analysis, and package evidence', '10-cycle Strategy Iteration Workspace with plan, execution, validation, and handoff evidence', 'ServerLens 10.0 page-by-page operation summary with primary action, evidence state, and next step for every view', 'capabilities.security-source-review', 'capabilities.release-readiness-workspace', 'capabilities.ecosystem-overview', 'capabilities.action-layer', 'capabilities.authorized-inspection-workspace', 'capabilities.10-cycle-strategy-workspace', 'capabilities.v10-page-operation-summary', 'references.current-v100-monitoring', 'verificationCommands', 'githubReferences', 'uptime-kuma', 'glances', 'node_exporter', 'dashy', 'retroui-card', 'safetyBoundary', 'win-unpacked', 'ServerLens.exe', 'readiness']) {
   if (!deliveryEvidence.includes(token)) {
     throw new Error(`Missing delivery evidence shared token: ${token}`);
   }
@@ -795,13 +760,13 @@ for (const token of ['buildDeliveryPackageChecklist', 'buildDeliveryValidationLe
   }
 }
 
-for (const token of ['playwright', 'launchPlaywrightBrowser', 'playwright.system-chrome', 'electron', 'captureWithElectron', 'electron.chromium-fallback', 'captureWithSystemBrowser', 'system-chromium-cdp-fallback', 'system-chromium-static-snapshot-fallback', 'runSystemBrowserCliEvidence', 'runSystemBrowserStaticSnapshotEvidence', 'staticSnapshotHtml', 'msedge.exe', 'chrome.exe', 'ui-visual-evidence.json', 'ui-evidence-desktop.png', 'ui-evidence-mobile.png', 'local-ui-visual-evidence', 'pixelChecks', 'horizontalOverflow', 'releaseWorkspacePresent', 'releaseCardsPresent', 'release-readiness-workspace', 'release-readiness-card', 'interactionStudioPresent', 'experienceDeckPresent', 'experienceControlsPresent', 'scenarioBoardPresent', 'scenarioCardsPresent', 'scenarioInspectorPresent', 'inspectionWorkspacePresent', 'inspectionCardsPresent', 'inspectionEvidencePresent', 'strategyWorkspacePresent', 'strategyCardsPresent', 'strategyEvidencePresent', 'tactileCardsPresent', 'actionDockPresent', 'interaction-studio', 'experience-deck', 'experience-stepper', 'scenario-board', 'scenario-card', 'scenario-inspector', 'inspection-workspace', 'inspection-step-card', 'inspection-evidence-panel', 'strategy-workspace', 'strategy-iteration-card', 'strategy-evidence-panel', 'tactile-card', 'action-dock', 'analysisRunBuilderPresent', 'serverInspectorPresent', 'evidenceTrackerPresent', 'analysis-run-builder', 'server-inspector', 'evidence-tracker', 'healthLabelsPresent', 'health-cell-label', 'SERVERLENS_UI_VISUAL_EVIDENCE']) {
+for (const token of ['playwright', 'launchPlaywrightBrowser', 'playwright.system-chrome', 'electron', 'captureWithElectron', 'electron.chromium-fallback', 'captureWithSystemBrowser', 'system-chromium-cdp-fallback', 'system-chromium-static-snapshot-fallback', 'runSystemBrowserCliEvidence', 'runSystemBrowserStaticSnapshotEvidence', 'staticSnapshotHtml', 'msedge.exe', 'chrome.exe', 'ui-visual-evidence.json', 'ui-evidence-desktop.png', 'ui-evidence-mobile.png', 'local-ui-visual-evidence', 'pixelChecks', 'horizontalOverflow', 'releaseWorkspacePresent', 'releaseCardsPresent', 'release-readiness-workspace', 'release-readiness-card', 'inspectionWorkspacePresent', 'inspectionCardsPresent', 'inspectionEvidencePresent', 'strategyWorkspacePresent', 'strategyCardsPresent', 'strategyEvidencePresent', 'tactileCardsPresent', 'actionDockPresent', 'ecosystemViewPresent', 'ecosystemPanelsPresent', 'ecosystemResourcePopulated', 'ecosystem-view', 'eco-resource', 'eco-services', 'eco-containers', 'eco-exposure', 'eco-risk', 'eco-freshness', 'renderEcosystem', '/api/ecosystem/overview', 'inspection-workspace', 'inspection-step-card', 'inspection-evidence-panel', 'strategy-workspace', 'strategy-iteration-card', 'strategy-evidence-panel', 'tactile-card', 'action-dock', 'analysisRunBuilderPresent', 'serverInspectorPresent', 'evidenceTrackerPresent', 'analysis-run-builder', 'server-inspector', 'evidence-tracker', 'healthLabelsPresent', 'health-cell-label', 'SERVERLENS_UI_VISUAL_EVIDENCE']) {
   if (!uiVisualEvidence.includes(token)) {
     throw new Error(`Missing UI visual evidence token: ${token}`);
   }
 }
 
-for (const token of ['createApp', 'electron', 'BrowserWindow', 'delivery-readiness-button', 'release-readiness-workspace', 'release-readiness-card', 'renderReleaseWorkspace', 'interaction-studio', 'experience-deck', 'experience-stepper', 'scenario-board', 'scenario-inspector', 'strategy-workspace', 'strategy-iteration-card', 'strategy-evidence-panel', 'action-dock', 'focus-peek', 'renderInteractionStudio', 'renderExperienceDeck', 'renderScenarioBoard', 'renderStrategyWorkspace', 'renderActionDock', 'command-palette-button', 'overscrollBehavior', 'backdropFilter', 'setSize(390, 900)', 'SERVERLENS_RUNTIME_SMOKE_OK']) {
+for (const token of ['createApp', 'electron', 'BrowserWindow', 'delivery-readiness-button', 'release-readiness-workspace', 'release-readiness-card', 'renderReleaseWorkspace', 'ecosystem-studio', 'eco-resource', 'eco-services', 'eco-containers', 'eco-exposure', 'eco-risk', 'eco-freshness', 'strategy-workspace', 'strategy-iteration-card', 'strategy-evidence-panel', 'action-dock', 'focus-peek', 'renderEcosystem', 'renderStrategyWorkspace', 'renderActionDock', 'command-palette-button', 'overscrollBehavior', 'backdropFilter', 'setSize(390, 900)', 'SERVERLENS_RUNTIME_SMOKE_OK']) {
   if (!runtimeSmoke.includes(token)) {
     throw new Error(`Missing runtime smoke token: ${token}`);
   }
